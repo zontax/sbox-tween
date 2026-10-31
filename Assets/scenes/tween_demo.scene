@@ -232,24 +232,6 @@
       "Children": []
     },
     {
-      "__guid": "31d5d1a3-d5de-4956-8c45-f747504555b4",
-      "__version": 2,
-      "Flags": 0,
-      "Name": "Tween Demo",
-      "Position": "0,0,0",
-      "Rotation": "0,0,0,1",
-      "Scale": "1,1,1",
-      "Tags": "",
-      "Enabled": true,
-      "NetworkMode": 2,
-      "NetworkFlags": 0,
-      "NetworkOrphaned": 0,
-      "NetworkTransmit": true,
-      "OwnerTransfer": 1,
-      "Components": [],
-      "Children": []
-    },
-    {
       "__guid": "7bac158e-a065-4b74-890d-b94c6fd69c09",
       "__version": 2,
       "Flags": 0,
@@ -277,10 +259,15 @@
             "Settings": {
               "Duration": 1.2,
               "Ease": "InOutSine",
-              "CustomEase": {
-                "rangex": "0,0",
-                "rangey": "0,0"
-              },
+              "CustomEase": [
+                {
+                  "x": 0.5,
+                  "y": 0.5,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
               "Cycles": -1,
               "CycleMode": "Yoyo",
               "StartDelay": 0,
@@ -301,10 +288,15 @@
             "Frequency": 10,
             "EnableFalloff": true,
             "FalloffEase": "Default",
-            "StrengthOverTime": {
-              "rangex": "0,0",
-              "rangey": "0,0"
-            },
+            "StrengthOverTime": [
+              {
+                "x": 0.5,
+                "y": 0.5,
+                "in": 0,
+                "out": 0,
+                "mode": "Mirrored"
+              }
+            ],
             "Asymmetry": 0,
             "EaseBetweenShakes": "Default",
             "Cycles": 1,
