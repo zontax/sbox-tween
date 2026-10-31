@@ -24,7 +24,8 @@ public sealed class TweenManager : IDisposable
 	public int MaxAliveTweens { get; private set; }
 
 	internal readonly Random Random = new();
-	internal readonly Dictionary<(GameObject Target, TweenType Type), (ValueContainer StartValue, int Count)> Shakes = [];
+	internal readonly Dictionary<(object Target, TweenType Type), (ValueContainer StartValue, int Count)> Shakes = [];
+	readonly List<PanelTweenState> _dirtyPanels = [];
 
 	readonly List<TweenData>[] _running = [[], [], []];
 	readonly List<TweenData>[] _pending = [[], [], []];
@@ -109,6 +110,7 @@ public sealed class TweenManager : IDisposable
 			Scene s => s,
 			GameObject go => go.Scene,
 			Component component => component.Scene,
+			Panel panel => panel.Scene,
 			_ => null
 		};
 
@@ -202,6 +204,7 @@ public sealed class TweenManager : IDisposable
 
 		AddNewTweens( updateType );
 		ProcessRequestedCompleteAll();
+		FlushPanels();
 	}
 
 	void UpdateTweenList( List<TweenData> list, float deltaTime, float unscaledDeltaTime )
@@ -255,6 +258,30 @@ public sealed class TweenManager : IDisposable
 			list.RemoveRange( list.Count - numRemoved, numRemoved );
 
 		ProcessRequestedCompleteAll();
+		FlushPanels();
+	}
+
+	internal void MarkPanelDirty( PanelTweenState state )
+	{
+		if ( state.IsTransformDirty )
+			return;
+
+		state.IsTransformDirty = true;
+		_dirtyPanels.Add( state );
+	}
+
+	/// <summary>
+	/// Writes the composed transforms of panels changed by tweens, once per panel.
+	/// </summary>
+	internal void FlushPanels()
+	{
+		if ( _dirtyPanels.Count == 0 )
+			return;
+
+		foreach ( var state in _dirtyPanels )
+			PanelTweens.Flush( state );
+
+		_dirtyPanels.Clear();
 	}
 
 	internal void AddNewTweens( UpdateType updateType )
@@ -311,6 +338,7 @@ public sealed class TweenManager : IDisposable
 		{
 			_manager.UpdateDepth--;
 			_manager.ProcessRequestedCompleteAll();
+			_manager.FlushPanels();
 		}
 	}
 
@@ -375,11 +403,16 @@ public sealed class TweenManager : IDisposable
 
 		_lastId++;
 		MaxAliveTweens = Math.Max( MaxAliveTweens, _tweensCount );
+		if ( PanelTweens.IsPanelType( tween.TweenType ) )
+			PanelTweens.OnAdded( tween );
 		return new Tween( tween );
 	}
 
 	void Release( TweenData tween )
 	{
+		if ( PanelTweens.IsPanelType( tween.TweenType ) )
+			PanelTweens.OnReleased( tween );
+
 		tween.Reset();
 		tween.Manager = null;
 		_pool.Add( tween );

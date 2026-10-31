@@ -40,6 +40,9 @@ internal sealed partial class TweenData
 			case TweenType.None:
 				return PropType.None;
 
+			case >= TweenType.PanelOpacity:
+				return PanelTweens.GetPropType( tweenType );
+
 			default:
 				return PropType.Float;
 		}
@@ -100,14 +103,14 @@ internal sealed partial class TweenData
 			case TweenType.SoundPitch: return ValueContainer.From( (target as BaseSoundComponent).Pitch );
 			case TweenType.SoundHandleVolume: return ValueContainer.From( (target as SoundHandle).Volume );
 			case TweenType.SoundHandlePitch: return ValueContainer.From( (target as SoundHandle).Pitch );
-			case TweenType.PanelOpacity: return ValueContainer.From( GetPanelOpacity( target as Panel ) );
 
 			default:
+				if ( PanelTweens.IsPanelType( TweenType ) )
+					return PanelTweens.Get( this );
+
 				throw new InvalidOperationException( $"Tween type {TweenType} doesn't support reading the current value." );
 		}
 	}
-
-	static float GetPanelOpacity( Panel panel ) => panel.Style.Opacity ?? panel.ComputedStyle?.Opacity ?? 1;
 
 	internal float CurrentFloat => StartValue.X + EndValueOrDiff.X * EasedInterpolationFactor;
 	internal Vector2 CurrentVector2 => (StartValue + EndValueOrDiff * EasedInterpolationFactor).Vector2;
@@ -251,10 +254,13 @@ internal sealed partial class TweenData
 			case TweenType.SoundPitch: (target as BaseSoundComponent).Pitch = FloatVal(); break;
 			case TweenType.SoundHandleVolume: (target as SoundHandle).Volume = FloatVal(); break;
 			case TweenType.SoundHandlePitch: (target as SoundHandle).Pitch = FloatVal(); break;
-			case TweenType.PanelOpacity: (target as Panel).Style.Opacity = FloatVal(); break;
 
 			default:
-				throw new InvalidOperationException( $"Tween type {TweenType} doesn't support setting the value." );
+				if ( !PanelTweens.IsPanelType( TweenType ) )
+					throw new InvalidOperationException( $"Tween type {TweenType} doesn't support setting the value." );
+
+				PanelTweens.Set( this );
+				break;
 		}
 
 		return true;

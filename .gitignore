@@ -16,6 +16,7 @@ Properties
 
 # Auto-generated asset related files
 *.generated.*
+!*.Generated.cs
 *.*_c
 *.vpk
 *.los

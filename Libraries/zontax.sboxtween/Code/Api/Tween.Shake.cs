@@ -116,7 +116,7 @@ public readonly partial struct Tween
 	public static Tween PunchCustom<T>( T target, Vector3 startValue, ShakeSettings settings, Action<T, Vector3> onValueChange ) where T : class
 		=> ShakeCustom( target, startValue, settings.WithPunch(), onValueChange );
 
-	static Tween ShakeTransform( TweenType tweenType, GameObject target, ShakeSettings settings )
+	static Tween ShakeTransform( TweenType tweenType, object target, ShakeSettings settings )
 	{
 		var manager = TweenManager.Resolve( target );
 		if ( manager is null || manager.IsDisposed )

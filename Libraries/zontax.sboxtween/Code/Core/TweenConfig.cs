@@ -62,6 +62,9 @@ public static class TweenConfig
 	/// <summary>Warn when CustomAdditive() is created without 'getCurrentValue', which lets the value accumulate rounding errors.</summary>
 	public static bool WarnCustomAdditiveWithoutGetter { get; set; } = true;
 
+	/// <summary>Warn when a panel tween animates a property that also has a CSS transition, which makes the tween lag behind.</summary>
+	public static bool WarnPanelTransitions { get; set; } = true;
+
 	/// <summary>Log an error when an OnComplete callback is ignored because its target was destroyed.</summary>
 	public static bool WarnIfTargetDestroyed { get; set; } = true;
 }

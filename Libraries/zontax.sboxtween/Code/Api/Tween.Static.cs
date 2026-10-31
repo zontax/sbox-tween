@@ -205,8 +205,16 @@ public readonly partial struct Tween
 	internal static Tween Animate( object target, TweenType tweenType, TweenSettings<Rotation> s ) => AnimateCore( target, tweenType, ValueContainer.From( s.StartValue ), ValueContainer.From( s.EndValue ), s.Settings, s.StartFromCurrent );
 	internal static Tween Animate( object target, TweenType tweenType, TweenSettings<Angles> s ) => AnimateCore( target, tweenType, ValueContainer.From( s.StartValue ), ValueContainer.From( s.EndValue ), s.Settings, s.StartFromCurrent );
 
-	internal static Tween AnimateCore( object target, TweenType tweenType, ValueContainer startValue, ValueContainer endValue, TweenSettings settings, bool startFromCurrent, TweenManager manager = null, long targetTweenId = 0 )
+	internal static Tween AnimateCore( object target, TweenType tweenType, ValueContainer startValue, ValueContainer endValue, TweenSettings settings, bool startFromCurrent, TweenManager manager = null, long targetTweenId = 0,
+		LengthUnit unitX = LengthUnit.Auto, LengthUnit unitY = LengthUnit.Auto )
 	{
+		// Vector2 translate overloads are in pixels
+		if ( tweenType == TweenType.PanelTranslate && unitX == LengthUnit.Auto )
+		{
+			unitX = LengthUnit.Pixels;
+			unitY = LengthUnit.Pixels;
+		}
+
 		manager ??= TweenManager.Resolve( target );
 		if ( manager is null || manager.IsDisposed )
 			return default;
@@ -215,6 +223,8 @@ public readonly partial struct Tween
 		tween.StartValue = startValue;
 		tween.EndValueOrDiff = endValue;
 		tween.TargetTweenId = targetTweenId;
+		tween.LengthUnitX = unitX;
+		tween.LengthUnitY = unitY;
 		tween.Setup( target, ref settings, startFromCurrent, tweenType );
 		return manager.Animate( tween );
 	}

@@ -726,6 +726,23 @@ public readonly partial struct Sequence : IEquatable<Sequence>
 	/// <inheritdoc cref="Tween.ToTask"/>
 	public Task ToTask() => Root.ToTask();
 
+	/// <summary>
+	/// Applies <see cref="Tween.ReleaseStyleOnComplete"/> to every panel tween inside this Sequence.
+	/// </summary>
+	public Sequence ReleaseStyleOnComplete()
+	{
+		if ( !TryManipulate() )
+			return this;
+
+		foreach ( var tween in new TweenData.AllTweensEnumerator( Root.Data ) )
+		{
+			if ( PanelTweens.IsPanelType( tween.TweenType ) )
+				tween.ReleasePanelStyle = true;
+		}
+
+		return this;
+	}
+
 	internal Sequence ResetOnCompletion()
 	{
 		Root.ResetOnCompletion();

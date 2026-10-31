@@ -256,11 +256,11 @@ internal sealed partial class TweenData
 	/// </summary>
 	bool TryTakeStartValueFromOtherShake()
 	{
-		if ( !IsShake( TweenType ) || Target is not GameObject go )
+		if ( !IsShake( TweenType ) || Target is not (GameObject or Panel) )
 			return false;
 
 		var shakes = Manager.Shakes;
-		var key = (go, TweenType);
+		var key = (Target, TweenType);
 		if ( !shakes.TryGetValue( key, out var data ) )
 		{
 			var startValue = GetAnimatedValue();
@@ -276,10 +276,10 @@ internal sealed partial class TweenData
 
 	void ResetShakeStartValue()
 	{
-		if ( Target is not GameObject go || Manager is null )
+		if ( Target is not (GameObject or Panel) || Manager is null )
 			return;
 
-		var key = (go, TweenType);
+		var key = (Target, TweenType);
 		var shakes = Manager.Shakes;
 		if ( !shakes.TryGetValue( key, out var data ) )
 			return;

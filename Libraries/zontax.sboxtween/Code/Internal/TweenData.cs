@@ -103,6 +103,14 @@ internal sealed partial class TweenData
 	/// <summary>The part of the previous deltas the target didn't absorb because of rounding.</summary>
 	internal ValueContainer AdditiveErr;
 
+	/// <summary>Units of Length-based panel tweens.</summary>
+	internal LengthUnit LengthUnitX;
+	internal LengthUnit LengthUnitY;
+	/// <summary>Clear the inline panel style when the tween ends, so CSS controls the property again.</summary>
+	internal bool ReleasePanelStyle;
+	internal bool PanelTransitionChecked;
+	internal bool PanelTransitionConflict;
+
 	internal bool HasOnUpdate => OnUpdateInvoker is not null;
 	internal bool HasOnComplete => OnCompleteInvoker is not null;
 
@@ -244,6 +252,11 @@ internal sealed partial class TweenData
 		IsAdditive = false;
 		AdditivePrevT = 0;
 		AdditiveErr = default;
+		LengthUnitX = default;
+		LengthUnitY = default;
+		ReleasePanelStyle = false;
+		PanelTransitionChecked = false;
+		PanelTransitionConflict = false;
 
 		Id = -1;
 	}
@@ -1253,7 +1266,8 @@ internal sealed partial class TweenData
 
 	internal static bool IsDestroyed( object obj ) => obj is IValid valid && !valid.IsValid;
 
-	internal static bool IsShake( TweenType tweenType ) => tweenType is TweenType.ShakeLocalPosition or TweenType.ShakeLocalRotation or TweenType.ShakeLocalScale or TweenType.ShakeCustom;
+	internal static bool IsShake( TweenType tweenType ) => tweenType is TweenType.ShakeLocalPosition or TweenType.ShakeLocalRotation or TweenType.ShakeLocalScale or TweenType.ShakeCustom
+		or TweenType.PanelShakeTranslate or TweenType.PanelShakeRotate or TweenType.PanelShakeScale;
 
 	internal void LogError( string message ) => TweenLog.Error( message );
 

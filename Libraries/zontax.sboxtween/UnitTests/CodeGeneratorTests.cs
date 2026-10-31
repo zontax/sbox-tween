@@ -13,6 +13,9 @@ public class CodeGeneratorTests
 	[TestMethod]
 	public void ExtensionsFileIsUpToDate() => AssertSame( TweenCodeGenerator.ExtensionsFileName, TweenCodeGenerator.GenerateExtensions() );
 
+	[TestMethod]
+	public void PanelExtensionsFileIsUpToDate() => AssertSame( TweenCodeGenerator.PanelExtensionsFileName, TweenCodeGenerator.GeneratePanelExtensions() );
+
 	static void AssertSame( string fileName, string generated )
 	{
 		var path = Path.Combine( ApiDirectory(), fileName );

@@ -162,6 +162,8 @@ class TweenListWidget : Widget
 			info += "  clock";
 		if ( entry.IsWaiting )
 			info += "  waiting";
+		if ( entry.HasTransitionConflict )
+			info += "  css transition!";
 		if ( entry.IsPaused )
 			info += "  paused";
 		return info;

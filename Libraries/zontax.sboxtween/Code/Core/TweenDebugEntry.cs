@@ -24,6 +24,10 @@ public readonly struct TweenDebugEntry
 
 	/// <summary>True if the animation is driven by a <see cref="Tween.Clock"/>.</summary>
 	public bool HasClock { get; }
+
+	/// <summary>True if a CSS transition on the panel conflicts with this panel tween.</summary>
+	public bool HasTransitionConflict { get; }
+
 	public bool IsPaused { get; }
 	public float TimeScale { get; }
 	public UpdateType UpdateType { get; }
@@ -71,6 +75,7 @@ public readonly struct TweenDebugEntry
 
 		IsWaiting = data.WaitPredicateShouldWait is not null && data.IsMainSequenceRoot();
 		HasClock = data.Clock is not null;
+		HasTransitionConflict = data.PanelTransitionConflict;
 		Target = data.Target == TweenManager.DummyTarget || data.Target is TweenData ? null : data.Target;
 		IsPaused = data.IsPaused;
 		TimeScale = data.TimeScale;

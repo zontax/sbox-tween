@@ -110,6 +110,37 @@ async Task Animate()
 
 Use `SetCancellationToken( token )` to stop (or complete) an animation when a token is canceled.
 
+## UI panels
+
+Panel tweens animate the inline style of a `Panel` (`panel.Style`). Every property has a static `Tween.PanelX( panel, … )` method and a `panel.TweenX( … )` extension.
+
+```csharp
+panel.TweenTranslate( new Vector2( 0, -40 ), 0.3f, Ease.OutBack );         // pixels
+panel.TweenTranslate( Length.Percent( -100 ), Length.Pixels( 0 ), 0.3f );  // any units
+panel.TweenScale( 1.2f, 0.2f );
+panel.TweenRotate( 15, 0.2f );
+panel.TweenOpacity( 0, 0.2f );
+panel.TweenBackgroundColor( Color.Red, 0.2f );
+panel.TweenFilterBlur( 6, 0.3f );
+panel.TweenWidth( Length.Percent( 100 ), 0.5f );
+
+panel.PunchScale( new Vector2( 0.1f, 0.1f ), 0.3f );
+panel.ShakeTranslate( new Vector2( 10, 4 ), 0.4f );
+
+// Intro and outro templates
+panel.TweenSlideIn( new Vector2( 0, 40 ) );
+panel.TweenPopIn();
+panel.DeleteAfter( panel.TweenPopOut() );
+```
+
+How it works with the s&box UI:
+
+- **Transform and opacity are cheap.** Translate, rotate and scale write into per-panel channels that are composed into one `transform` per frame, so several transform tweens on one panel don't overwrite each other, and the layout isn't recalculated. Width, margins, paddings, gaps and positions go through the layout engine and recalculate it every frame.
+- **Inline style wins over CSS.** The animated value stays after the tween ends, so `:hover` and classes can't change that property anymore. Call `.ReleaseStyleOnComplete()` on a tween or sequence to give the property back to CSS when it ends in any way (completed, stopped, panel deleted), or `panel.ReleaseTweenedStyles()` to clear everything at once.
+- **Razor.** Start tweens from code (`OnTreeFirstBuilt`, `OnTreeBuilt`, event handlers, `@ref` panels). Don't put an animated property into a razor `style="…"` attribute: razor writes it again whenever the attribute string changes. Classes are fine. If razor removes a panel, its tweens stop.
+- **CSS transitions.** A `transition` on the same property restarts on every tween update and makes the tween lag. SboxTween warns about it (`TweenConfig.WarnPanelTransitions`) and marks such tweens in the Tween Debugger.
+- **Lengths** keep their units; start and end values must use the same unit. Starting from the current value reads the inline style first, then the computed style.
+
 ## Controlling tweens
 
 ```csharp
