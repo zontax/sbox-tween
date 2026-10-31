@@ -298,9 +298,23 @@ public readonly partial struct Tween : IEquatable<Tween>
 				throw new ArgumentException( $"Invalid TimeScale: {value}." );
 
 			ClampTimeScale( ref value );
+			if ( Data.HasWait && !ValidateWaitTimeScale( value ) )
+				return;
+
 			if ( ValidateIsNotCompleting() )
 				Data.TimeScale = value;
 		}
+	}
+
+	internal static bool ValidateWaitTimeScale( float timeScale )
+	{
+		if ( timeScale < 0 )
+		{
+			TweenLog.Error( "Negative 'TimeScale' is not supported on a Sequence that contains a ChainWaitWhile() or ChainWaitUntil() element." );
+			return false;
+		}
+
+		return true;
 	}
 
 	internal static void ClampTimeScale( ref float timeScale )
@@ -383,6 +397,14 @@ public readonly partial struct Tween : IEquatable<Tween>
 		}
 
 		var data = Data;
+		if ( data.HasWait )
+		{
+			// A Sequence with a wait always has 1 cycle
+			if ( cycles != 1 )
+				TweenLog.Error( $"'{nameof( SetRemainingCycles )}()' with cycles other than 1 is not supported on a Sequence that contains a ChainWaitWhile() or ChainWaitUntil() element." );
+			return;
+		}
+
 		if ( data.TweenType == TweenType.Delay && data.HasOnComplete )
 		{
 			TweenLog.Error( "Applying cycles to Delay will not repeat the OnComplete() callback, but instead will increase the Delay duration. " +
@@ -516,6 +538,131 @@ public readonly partial struct Tween : IEquatable<Tween>
 	/// Returns a Task that completes when the tween is no longer alive.
 	/// </summary>
 	public Task ToTask() => AwaiterSource.Create( this );
+
+	/// <summary>
+	/// Controls the animation's time with a <see cref="Clock"/>. One clock can control many animations, but all of them must have the same update type.
+	/// </summary>
+	public Tween SetClock( Clock clock )
+	{
+		if ( clock is null )
+		{
+			TweenLog.Error( "'clock' is null." );
+			return this;
+		}
+
+		if ( !ValidateCanModify( this ) )
+			return this;
+
+		var updateType = Data.UpdateType;
+		if ( clock.UpdateType == UpdateType.Default )
+		{
+			clock.UpdateType = updateType;
+		}
+		else if ( clock.UpdateType != updateType )
+		{
+			TweenLog.Error( $"The clock is bound to the '{clock.UpdateType}' update type by the first {nameof( SetClock )}() call, and the binding is permanent. This animation has '{updateType}'. Please use a separate Clock for each update type." );
+			return this;
+		}
+
+		Data.Clock = clock;
+		return this;
+	}
+
+	/// <summary>
+	/// A shared time source for animations, assigned with <see cref="SetClock"/>.
+	/// <code>
+	/// var clock = new Tween.Clock();
+	/// Tween.LocalPositionX( go, 100, 1 ).SetClock( clock );
+	/// Sequence.Create().Chain( Tween.LocalScale( go, 2, 1 ) ).SetClock( clock );
+	/// clock.TimeScale = 0.5f; // slows down both animations
+	/// </code>
+	/// </summary>
+	public sealed class Clock
+	{
+		const float MaxManualDeltaTime = 10;
+
+		/// <summary>
+		/// When true, animations advance only by the time passed to <see cref="Tick"/>, and don't update in frames without a Tick.
+		/// Changing this value discards the ticks that haven't been applied yet.
+		/// </summary>
+		public bool IsManual
+		{
+			get => _isManual;
+			set
+			{
+				if ( _isManual == value )
+					return;
+
+				_isManual = value;
+				_pendingDeltaTime = 0;
+				_hasPendingTick = false;
+			}
+		}
+
+		/// <summary>Multiplies the delta time of all animations that use this clock, on top of their own TimeScale.</summary>
+		public float TimeScale
+		{
+			get => _timeScale;
+			set
+			{
+				if ( float.IsNaN( value ) || float.IsInfinity( value ) )
+					throw new ArgumentException( $"Invalid TimeScale: {value}." );
+
+				ClampTimeScale( ref value );
+				_timeScale = value;
+			}
+		}
+
+		internal UpdateType UpdateType;
+		bool _isManual;
+		float _timeScale = 1;
+		float _pendingDeltaTime;
+		bool _hasPendingTick;
+		float _passDeltaTime;
+		bool _isPassTicked;
+		int _updatePass = -1;
+
+		/// <summary>
+		/// Advances the animations of a manual clock (<see cref="IsManual"/>). Several calls before the next update accumulate.
+		/// </summary>
+		public void Tick( float deltaTime )
+		{
+			if ( float.IsNaN( deltaTime ) )
+			{
+				TweenLog.Error( $"Invalid deltaTime: {deltaTime}." );
+				return;
+			}
+
+			if ( MathF.Abs( deltaTime ) > MaxManualDeltaTime )
+			{
+				TweenLog.Error( $"deltaTime ({deltaTime}) should be in the [-{MaxManualDeltaTime}, {MaxManualDeltaTime}] range." );
+				deltaTime = Math.Clamp( deltaTime, -MaxManualDeltaTime, MaxManualDeltaTime );
+			}
+
+			_pendingDeltaTime += deltaTime;
+			_hasPendingTick = true;
+		}
+
+		/// <summary>
+		/// Pending ticks are consumed once per update pass, so all animations sharing the clock receive the same delta time.
+		/// </summary>
+		internal bool TryGetDeltaTime( out float deltaTime )
+		{
+			int pass = TweenManager.UpdatePassCount;
+			if ( _updatePass != pass )
+			{
+				_updatePass = pass;
+				// Clamped silently because ticks legitimately accumulate while all animations of the clock are paused
+				_passDeltaTime = Math.Clamp( _pendingDeltaTime, -MaxManualDeltaTime, MaxManualDeltaTime );
+				_isPassTicked = _hasPendingTick;
+				_pendingDeltaTime = 0;
+				_hasPendingTick = false;
+			}
+
+			deltaTime = _passDeltaTime;
+			return _isPassTicked;
+		}
+	}
 
 	/// <summary>Instantly resets the animation to the beginning upon completion.</summary>
 	internal Tween ResetOnCompletion()

@@ -155,6 +155,8 @@ public readonly partial struct Tween
 		float end = settings.EndValue;
 		ClampTimeScale( ref start );
 		ClampTimeScale( ref end );
+		if ( tween.Data.HasWait && (!ValidateWaitTimeScale( start ) || !ValidateWaitTimeScale( end )) )
+			return default;
 		settings.StartValue = start;
 		settings.EndValue = end;
 

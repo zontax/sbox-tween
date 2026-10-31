@@ -7,7 +7,7 @@ namespace SboxTweenExample;
 [Title( "Tween Demo" ), Category( "SboxTween" ), Icon( "animation" )]
 public sealed class TweenDemo : Component
 {
-	const float StandSpacing = 170;
+	const float StandSpacing = 145;
 
 	static readonly Ease[] RaceEases = [Ease.Linear, Ease.InOutSine, Ease.OutBack, Ease.OutElastic, Ease.OutBounce, Ease.InOutExpo];
 
@@ -24,6 +24,11 @@ public sealed class TweenDemo : Component
 	public string LastEvent { get; private set; } = "Ready";
 	public int AsyncLoops { get; private set; }
 	public int Callbacks { get; private set; }
+	public bool IsGateOpen { get; private set; }
+	public bool IsRaceSlow { get; private set; }
+
+	/// <summary>True while the gate sequence is suspended by ChainWaitUntil.</summary>
+	public bool IsGateWaiting => _gateSequence.IsAlive && _gateSequence.IsWaiting;
 
 	/// <summary>Progress of the showcase sequence, 0..1. Zero when it's not playing.</summary>
 	public float SequenceProgress => _sequence.IsAlive ? _sequence.ProgressTotal : 0;
@@ -40,10 +45,14 @@ public sealed class TweenDemo : Component
 	GameObject _orbitPivot;
 	GameObject _speedBox;
 	Sequence _sequence;
+	GameObject _gateBox;
+	Sequence _gateSequence;
+	Tween.Clock _raceClock;
 	Tween _timeScaleTween;
 
 	protected override void OnStart()
 	{
+		
 		Rebuild();
 	}
 
@@ -61,26 +70,31 @@ public sealed class TweenDemo : Component
 		BuildColorStand( StandPosition( 3 ) );
 		BuildAsyncStand( StandPosition( 4 ) );
 		BuildSpeedStand( StandPosition( 5 ) );
+		BuildGateStand( StandPosition( 6 ) );
 
 		IsPaused = false;
+		IsGateOpen = false;
+		IsRaceSlow = false;
 		Report( "Demo rebuilt" );
 	}
 
-	static Vector3 StandPosition( int index ) => new( 0, (2.5f - index) * StandSpacing, 0 );
+	static Vector3 StandPosition( int index ) => new( 0, (3 - index) * StandSpacing, 0 );
 
 	#region Stands
 
 	void BuildEaseRace( Vector3 position )
 	{
 		var stand = CreateStand( "Ease Race", position );
+		// One clock drives the whole race, so its TimeScale slows down all six tweens at once
+		_raceClock = new Tween.Clock();
 		for ( int i = 0; i < RaceEases.Length; i++ )
 		{
-			float y = (RaceEases.Length * 0.5f - 0.5f - i) * 26;
+			float y = (RaceEases.Length * 0.5f - 0.5f - i) * 21;
 			var box = CreateModel( stand, "models/dev/box.vmdl", new Vector3( 0, y, 70 ), 0.4f, RaceColors[i] );
 			box.Name = RaceEases[i].ToString();
 
 			// Infinite yoyo: the same animation with a different ease on every box
-			Tween.LocalPositionZ( box, 70, 200, 1.6f, RaceEases[i], cycles: -1, cycleMode: CycleMode.Yoyo );
+			Tween.LocalPositionZ( box, 70, 200, 1.6f, RaceEases[i], cycles: -1, cycleMode: CycleMode.Yoyo ).SetClock( _raceClock );
 
 			// Vertical label under the box
 			var label = CreateLabel( stand, RaceEases[i].ToString(), new Vector3( -10, y, 30 ), 0.1f );
@@ -146,6 +160,28 @@ public sealed class TweenDemo : Component
 		_speedBox = CreateModel( stand, "models/dev/box.vmdl", new Vector3( 0, -40, 20 ), 0.3f, "#ff5964" );
 		// Incremental cycles keep stacking the rotation
 		Tween.LocalRotation( _speedBox, Rotation.Identity, Rotation.FromYaw( 90 ), 0.5f, Ease.OutBack, cycles: -1, cycleMode: CycleMode.Incremental );
+	}
+
+	void BuildGateStand( Vector3 position )
+	{
+		var stand = CreateStand( "Wait & Additive", position );
+		_gateBox = CreateModel( stand, "models/dev/box.vmdl", new Vector3( 0, 0, 25 ), 0.6f, "#6bf178" );
+		PlayGateLoop();
+	}
+
+	/// <summary>Rises, waits until the gate is opened from the UI, falls down and repeats.</summary>
+	void PlayGateLoop()
+	{
+		var renderer = _gateBox.Components.Get<ModelRenderer>();
+		_gateSequence = Sequence.Create()
+			.Chain( Tween.LocalPositionZ( _gateBox, 25, 150, 0.6f, Ease.OutBack ) )
+			.Group( Tween.Color( renderer, "#ffb84d", 0.3f ) )
+			.ChainWaitUntil( this, static demo => demo.IsGateOpen )
+			.Chain( Tween.Color( renderer, "#6bf178", 0.2f ) )
+			.Chain( Tween.LocalPositionZ( _gateBox, 150, 25, 0.5f, Ease.OutBounce ) )
+			.ChainCallback( this, static demo => demo.IsGateOpen = false )
+			.ChainDelay( 0.3f )
+			.OnComplete( this, static demo => demo.PlayGateLoop() );
 	}
 
 	async Task RunAsyncLoop( GameObject box )
@@ -264,6 +300,28 @@ public sealed class TweenDemo : Component
 		Report( $"Stopped {count} animations" );
 	}
 
+	/// <summary>Lets the waiting gate sequence continue.</summary>
+	public void OpenGate()
+	{
+		IsGateOpen = true;
+		Report( "Gate opened" );
+	}
+
+	/// <summary>Each click adds a quarter turn; additive tweens blend, so fast clicks stack smoothly.</summary>
+	public void AdditiveSpin()
+	{
+		Tween.LocalRotationAdditive( _gateBox, new Angles( 0, 90, 0 ), 0.6f, Ease.OutBack );
+		Report( "Additive spin" );
+	}
+
+	/// <summary>Slows down all race tweens at once through their shared clock.</summary>
+	public void ToggleRaceClock()
+	{
+		IsRaceSlow = !IsRaceSlow;
+		_raceClock.TimeScale = IsRaceSlow ? 0.25f : 1;
+		Report( IsRaceSlow ? "Race clock x0.25" : "Race clock x1" );
+	}
+
 	void Report( string message )
 	{
 		LastEvent = message;
@@ -287,7 +345,7 @@ public sealed class TweenDemo : Component
 
 		var pad = CreateModel( stand, "models/dev/box.vmdl", new Vector3( 0, 0, 1 ), 1, "#3b4252" );
 		pad.Name = "Pad";
-		pad.LocalScale = new Vector3( 2.4f, 2.8f, 0.08f );
+		pad.LocalScale = new Vector3( 2.4f, 2.6f, 0.08f );
 
 		CreateLabel( stand, title, new Vector3( 0, 0, 230 ), 0.22f );
 		return stand;

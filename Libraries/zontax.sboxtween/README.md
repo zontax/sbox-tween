@@ -57,6 +57,46 @@ Sequence.Create( cycles: 2, Sequence.SequenceCycleMode.Yoyo )
 	.Insert( 0.5f, Tween.Color( renderer, Color.Red, 0.5f ) );
 ```
 
+## Waits
+
+Suspend a Sequence until a condition is met. Waits don't change the Sequence duration and work on sequences with 1 cycle and linear ease.
+
+```csharp
+Sequence.Create()
+	.Chain( Tween.LocalPositionZ( door, 100, 1 ) )
+	.ChainWaitWhile( player, static p => p.IsInDoorway, timeout: 5 )
+	.Chain( Tween.LocalPositionZ( door, 0, 1 ) );
+```
+
+## Additive tweens
+
+Additive tweens animate deltas, so several of them blend on the same value:
+
+```csharp
+// Each call adds a quarter turn; fast calls stack smoothly
+Tween.LocalRotationAdditive( GameObject, new Angles( 0, 90, 0 ), 0.5f, Ease.OutBack );
+Tween.LocalPositionAdditive( GameObject, Vector3.Up * 20, 0.3f, cycles: 2, cycleMode: CycleMode.Yoyo );
+
+Tween.CustomAdditive( this, 10f, new TweenSettings( 1 ), static ( self, delta ) => self.Value += delta, static self => self.Value );
+```
+
+Pass `getCurrentValue` to custom additive tweens: it lets the tween compensate float rounding so the value doesn't drift.
+
+## Clock
+
+A `Tween.Clock` controls the time of many animations at once:
+
+```csharp
+var clock = new Tween.Clock();
+Tween.LocalPositionX( go, 100, 1 ).SetClock( clock );
+Sequence.Create().Chain( Tween.LocalScale( go, 2, 1 ) ).SetClock( clock );
+clock.TimeScale = 0.5f; // slows down both
+
+// A manual clock advances only by Tick()
+var manual = new Tween.Clock { IsManual = true };
+manual.Tick( Time.Delta );
+```
+
 ## Async/await
 
 ```csharp

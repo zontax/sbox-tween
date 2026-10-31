@@ -158,6 +158,10 @@ class TweenListWidget : Widget
 		string info = $"{entry.Duration:0.00}s  {cycles}";
 		if ( entry.TimeScale != 1 )
 			info += $"  ×{entry.TimeScale:0.##}";
+		if ( entry.HasClock )
+			info += "  clock";
+		if ( entry.IsWaiting )
+			info += "  waiting";
 		if ( entry.IsPaused )
 			info += "  paused";
 		return info;

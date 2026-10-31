@@ -18,6 +18,12 @@ public readonly struct TweenDebugEntry
 	public object Target { get; }
 
 	public bool IsSequence { get; }
+
+	/// <summary>True while a sequence is suspended by a WaitWhile or WaitUntil.</summary>
+	public bool IsWaiting { get; }
+
+	/// <summary>True if the animation is driven by a <see cref="Tween.Clock"/>.</summary>
+	public bool HasClock { get; }
 	public bool IsPaused { get; }
 	public float TimeScale { get; }
 	public UpdateType UpdateType { get; }
@@ -57,6 +63,14 @@ public readonly struct TweenDebugEntry
 			TweenType.SoundHandlePitch => "SoundPitch",
 			_ => data.TweenType.ToString()
 		};
+
+		if ( data.IsAdditive )
+			Name += " (additive)";
+		else if ( data.HasWait && data.TweenType == TweenType.Delay )
+			Name = "Wait";
+
+		IsWaiting = data.WaitPredicateShouldWait is not null && data.IsMainSequenceRoot();
+		HasClock = data.Clock is not null;
 		Target = data.Target == TweenManager.DummyTarget || data.Target is TweenData ? null : data.Target;
 		IsPaused = data.IsPaused;
 		TimeScale = data.TimeScale;

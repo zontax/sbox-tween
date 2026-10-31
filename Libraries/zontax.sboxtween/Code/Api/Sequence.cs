@@ -252,6 +252,14 @@ public readonly partial struct Sequence : IEquatable<Sequence>
 			return this;
 		}
 
+		if ( other.HasWait )
+		{
+			if ( !ValidateWaitIsSupported() )
+				return this;
+
+			Root.Data.HasWait = true;
+		}
+
 		other.TweenType = TweenType.NestedSequence;
 		InsertInternal( atTime, sequence.Root );
 		return this;
@@ -377,6 +385,110 @@ public readonly partial struct Sequence : IEquatable<Sequence>
 		return Chain( Tween.CreateDelay( TweenManager.DummyTarget, duration, false, TweenType.Delay, true, Root.Data.Manager ) );
 	}
 
+	#region Waits
+
+	/// <summary>True while the Sequence is suspended by a WaitWhile or WaitUntil.</summary>
+	public bool IsWaiting => TryManipulate() && Root.Data.WaitPredicateShouldWait is not null;
+
+	/// <summary>
+	/// Suspends the Sequence while <paramref name="predicate"/> returns true. Doesn't change <see cref="Duration"/>.
+	/// Only supported on sequences with 1 cycle and <see cref="Ease.Linear"/>. Setting <see cref="ElapsedTime"/> or <see cref="Progress"/> directly bypasses the suspension.
+	/// <code>
+	/// Sequence.Create()
+	///     .Chain( Tween.LocalPositionZ( door, 100, 1 ) )
+	///     .ChainWaitWhile( player, static p => p.IsInDoorway, timeout: 5 )
+	///     .Chain( Tween.LocalPositionZ( door, 0, 1 ) );
+	/// </code>
+	/// </summary>
+	/// <param name="target">Passed to the predicate to avoid closure allocations. If it's destroyed, the wait ends.</param>
+	/// <param name="timeout">The wait ends after this time even if the predicate still wants to wait.</param>
+	public Sequence ChainWaitWhile<T>( T target, Predicate<T> predicate, float? timeout = null ) where T : class => InsertWait( Duration, target, predicate, false, timeout );
+
+	/// <summary>Suspends the Sequence until <paramref name="predicate"/> returns true. See <see cref="ChainWaitWhile{T}(T, Predicate{T}, float?)"/>.</summary>
+	public Sequence ChainWaitUntil<T>( T target, Predicate<T> predicate, float? timeout = null ) where T : class => InsertWait( Duration, target, predicate, true, timeout );
+
+	/// <inheritdoc cref="ChainWaitWhile{T}(T, Predicate{T}, float?)"/>
+	public Sequence InsertWaitWhile<T>( float atTime, T target, Predicate<T> predicate, float? timeout = null ) where T : class => InsertWait( atTime, target, predicate, false, timeout );
+
+	/// <inheritdoc cref="ChainWaitUntil{T}(T, Predicate{T}, float?)"/>
+	public Sequence InsertWaitUntil<T>( float atTime, T target, Predicate<T> predicate, float? timeout = null ) where T : class => InsertWait( atTime, target, predicate, true, timeout );
+
+	/// <summary>Suspends the Sequence while <paramref name="predicate"/> returns true. A capturing lambda allocates; prefer the overload with a target.</summary>
+	public Sequence ChainWaitWhile( Func<bool> predicate, float? timeout = null ) => InsertWait( Duration, predicate, static p => p(), false, timeout );
+
+	/// <summary>Suspends the Sequence until <paramref name="predicate"/> returns true. A capturing lambda allocates; prefer the overload with a target.</summary>
+	public Sequence ChainWaitUntil( Func<bool> predicate, float? timeout = null ) => InsertWait( Duration, predicate, static p => p(), true, timeout );
+
+	Sequence InsertWait<T>( float atTime, T target, Predicate<T> predicate, bool isWaitUntil, float? timeout ) where T : class
+	{
+		if ( !ValidateCanModifyDuration() || !ValidateWaitIsSupported() )
+			return this;
+
+		if ( TweenData.IsDestroyed( target ) )
+		{
+			TweenLog.Error( "'target' has been destroyed." );
+			return this;
+		}
+
+		if ( predicate is null )
+		{
+			TweenLog.Error( "'predicate' is null." );
+			return this;
+		}
+
+		if ( timeout is float t && (float.IsNaN( t ) || t <= 0) )
+		{
+			TweenLog.Error( $"'timeout' should be greater than 0, but was {t}." );
+			timeout = null;
+		}
+
+		var wait = Tween.CreateDelay( (object)target ?? TweenManager.DummyTarget, 0, false, TweenType.Delay, false, Root.Data.Manager );
+		if ( !wait.IsAliveInternal )
+			return this;
+
+		var data = wait.Data;
+		Root.Data.HasWait = true;
+		data.HasWait = true;
+		data.WaitPredicateTarget = target;
+		data.WaitPredicate = predicate;
+		data.WaitTimeout = timeout ?? float.PositiveInfinity;
+		// Two non-capturing lambdas instead of a flag: the invoker is copied to the main sequence when it suspends
+		data.WaitPredicateShouldWait = isWaitUntil ? static d => ShouldWait<T>( d, true ) : static d => ShouldWait<T>( d, false );
+		return Insert( atTime, wait );
+	}
+
+	static bool ShouldWait<T>( TweenData data, bool isWaitUntil ) where T : class
+	{
+		var predicate = data.WaitPredicate as Predicate<T>;
+		var target = data.WaitPredicateTarget as T;
+		if ( TweenData.IsDestroyed( target ) )
+			return false;
+
+		try
+		{
+			return predicate( target ) ^ isWaitUntil;
+		}
+		catch ( Exception e )
+		{
+			TweenLog.Exception( e, "Wait predicate raised exception, aborting the wait." );
+			return false;
+		}
+	}
+
+	bool ValidateWaitIsSupported()
+	{
+		var data = Root.Data;
+		if ( data.CyclesTotal != 1 || data.Ease != Ease.Linear )
+		{
+			TweenLog.Error( $"WaitUntil and WaitWhile are only supported on sequences with 'cycles: 1' and 'sequenceEase: Ease.Linear', but this Sequence has 'cycles: {data.CyclesTotal}' and 'sequenceEase: {data.Ease}'." );
+			return false;
+		}
+
+		return true;
+	}
+
+	#endregion
+
 	bool ValidateCanModifyDuration()
 	{
 		if ( !Tween.ValidateCanModify( Root ) )
@@ -430,6 +542,12 @@ public readonly partial struct Sequence : IEquatable<Sequence>
 		if ( otherData.HasCancellationToken )
 		{
 			TweenLog.Error( "Adding an animation with a CancellationToken to a Sequence is not allowed because the Sequence controls the lifetime of all its children. Call SetCancellationToken() on the Sequence itself instead." );
+			return false;
+		}
+
+		if ( otherData.Clock is not null )
+		{
+			TweenLog.Error( "Adding an animation with a Clock to a Sequence is not allowed because the Sequence controls the time of all its children. Call SetClock() on the Sequence itself instead." );
 			return false;
 		}
 
@@ -592,6 +710,13 @@ public readonly partial struct Sequence : IEquatable<Sequence>
 	public Sequence SetCancellationToken( CancellationToken cancellationToken, TweenSettings.CancellationMode? cancellationMode = null )
 	{
 		Root.SetCancellationToken( cancellationToken, cancellationMode );
+		return this;
+	}
+
+	/// <inheritdoc cref="Tween.SetClock"/>
+	public Sequence SetClock( Tween.Clock clock )
+	{
+		Root.SetClock( clock );
 		return this;
 	}
 

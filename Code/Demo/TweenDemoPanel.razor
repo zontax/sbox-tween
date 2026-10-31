@@ -24,6 +24,13 @@
 			<div class="button" onclick=@( () => Demo?.ShakeCamera() )>Camera</div>
 		</div>
 
+		<div class="section">Wait · Additive · Clock</div>
+		<div class="row">
+			<div class="button @( Demo?.IsGateWaiting == true ? "active" : "" )" onclick=@( () => Demo?.OpenGate() )>Open Gate</div>
+			<div class="button" onclick=@( () => Demo?.AdditiveSpin() )>Spin +90°</div>
+			<div class="button @( Demo?.IsRaceSlow == true ? "active" : "" )" onclick=@( () => Demo?.ToggleRaceClock() )>Race ×0.25</div>
+		</div>
+
 		<div class="section">Control</div>
 		<div class="row">
 			<div class="button @( Demo?.IsSlowMotion == true ? "active" : "" )" onclick=@( () => Demo?.ToggleSlowMotion() )>Slow-mo</div>
@@ -65,7 +72,6 @@
 		Demo?.LastEvent,
 		Demo?.AsyncLoops,
 		Demo?.Callbacks,
-		Demo?.IsSlowMotion,
-		Demo?.IsPaused,
-		Scene.TimeScale );
+		Scene.TimeScale,
+		HashCode.Combine( Demo?.IsSlowMotion, Demo?.IsPaused, Demo?.IsGateWaiting, Demo?.IsRaceSlow ) );
 }

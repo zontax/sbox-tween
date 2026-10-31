@@ -86,6 +86,23 @@ internal sealed partial class TweenData
 	/// <summary>Id of the animation targeted by TweenTimeScale and awaiters, to detect when the target is recycled.</summary>
 	internal long TargetTweenId;
 
+	/// <summary>Set on a wait animation and propagated to all its parent sequences.</summary>
+	internal bool HasWait;
+	internal object WaitPredicateTarget;
+	internal object WaitPredicate;
+	/// <summary>On a wait animation: its predicate invoker. On the main sequence root: the active wait, or null if not waiting.</summary>
+	internal Predicate<TweenData> WaitPredicateShouldWait;
+	/// <summary>On a wait animation: its timeout. On the main sequence root: the remaining timeout of the active wait.</summary>
+	internal float WaitTimeout;
+
+	internal SboxTween.Tween.Clock Clock;
+
+	internal bool IsAdditive;
+	/// <summary>The eased factor of the previous additive update.</summary>
+	internal float AdditivePrevT;
+	/// <summary>The part of the previous deltas the target didn't absorb because of rounding.</summary>
+	internal ValueContainer AdditiveErr;
+
 	internal bool HasOnUpdate => OnUpdateInvoker is not null;
 	internal bool HasOnComplete => OnCompleteInvoker is not null;
 
@@ -220,6 +237,13 @@ internal sealed partial class TweenData
 		ParametricStrength = 0;
 		ParametricPeriod = 0;
 		TargetTweenId = 0;
+		HasWait = false;
+		ClearWait();
+		WaitTimeout = 0;
+		Clock = null;
+		IsAdditive = false;
+		AdditivePrevT = 0;
+		AdditiveErr = default;
 
 		Id = -1;
 	}
@@ -441,7 +465,25 @@ internal sealed partial class TweenData
 		}
 
 		if ( !IsPaused )
-			return SetElapsedTimeTotal( ElapsedTimeTotal + dt * TimeScale, true );
+		{
+			bool isTicked = true;
+			float timeScale = TimeScale;
+			if ( Clock is not null )
+			{
+				if ( Clock.IsManual )
+					isTicked = Clock.TryGetDeltaTime( out dt );
+
+				// Clamped to keep the max cycles per update within the limit
+				timeScale = Math.Clamp( timeScale * Clock.TimeScale, -SboxTween.Tween.MaxTimeScale, SboxTween.Tween.MaxTimeScale );
+
+				// The TimeScale setter rejects negative values on wait sequences, but the clock doesn't know its animations
+				if ( HasWait && dt * timeScale < 0 )
+					dt = 0;
+			}
+
+			if ( isTicked )
+				return SetElapsedTimeTotal( ElapsedTimeTotal + dt * timeScale, true );
+		}
 
 		if ( IsTargetDestroyed() )
 		{
@@ -458,8 +500,29 @@ internal sealed partial class TweenData
 		{
 			if ( IsMainSequenceRoot() )
 			{
-				IsUpdating = true;
-				UpdateSequence( newElapsedTimeTotal, false, earlyExitSequenceIfPaused, true, false );
+				// Waits are ignored when the time is set from Progress or ElapsedTime
+				if ( HasWait && earlyExitSequenceIfPaused )
+				{
+					if ( WaitPredicateShouldWait is not null )
+					{
+						// The sequence is suspended: only the timeout runs
+						WaitTimeout -= newElapsedTimeTotal - ElapsedTimeTotal;
+						if ( !WaitPredicateShouldWait( this ) || WaitTimeout <= 0 )
+							ClearWait();
+					}
+					else
+					{
+						// Callbacks of children can't seek the sequence while it iterates them
+						IsUpdating = true;
+						UpdateSequenceUpToFirstWait( newElapsedTimeTotal );
+					}
+				}
+				else
+				{
+					IsUpdating = true;
+					UpdateSequence( newElapsedTimeTotal, false, earlyExitSequenceIfPaused, true, false );
+				}
+
 				IsUpdating = false;
 			}
 		}
@@ -616,6 +679,120 @@ internal sealed partial class TweenData
 			return true;
 
 		return earlyExitSequenceIfPaused && IsPaused;
+	}
+
+	/// <summary>
+	/// Updates children forward up to the first wait that suspends the sequence. Returns true if a wait suspended it.
+	/// Sequences with waits always have one cycle, linear ease and can't move backward.
+	/// </summary>
+	bool UpdateSequenceUpToFirstWait( float newElapsedTimeTotal )
+	{
+		float encompassingElapsedTime = newElapsedTimeTotal - WaitDelay;
+
+		// Deviation from PrimeTween: exactly at the end, zero-duration children (callbacks, waits) are still 'Before',
+		// so the sequence would complete without them. Move the children to the end like UpdateSequence() does on completion
+		if ( encompassingElapsedTime >= CycleDuration )
+			encompassingElapsedTime = float.MaxValue;
+
+		foreach ( var child in new SelfChildrenEnumerator( Sequence, true ) )
+		{
+			if ( child.IsSequenceRoot() )
+			{
+				if ( child.HasWait )
+				{
+					if ( child.UpdateSequenceUpToFirstWait( encompassingElapsedTime ) )
+						return true;
+				}
+				else
+				{
+					// A sibling's wait doesn't restrict this sequence's cycles, easing, or direction
+					child.UpdateSequenceChild( encompassingElapsedTime, false, false );
+				}
+			}
+			else if ( child.ElapsedTimeTotal < encompassingElapsedTime // Update tweens only forward
+				&& child.UpdateAndSetElapsedTimeTotal( encompassingElapsedTime, out int cyclesDiff, false ) )
+			{
+				if ( !IsAlive || IsPaused )
+					return false;
+
+				if ( !child.StoppedEmergently && child.IsAlive )
+				{
+					bool shouldWait = child.HasWait && child.WaitPredicateShouldWait( child );
+					if ( !IsAlive )
+					{
+						// The predicate can stop or complete the sequence and unlink all its children
+						return true;
+					}
+
+					if ( shouldWait )
+					{
+						// The main sequence holds the active wait
+						var mainSequence = child.FindMainSequence();
+						mainSequence.WaitPredicateTarget = child.WaitPredicateTarget;
+						mainSequence.WaitPredicate = child.WaitPredicate;
+						mainSequence.WaitPredicateShouldWait = child.WaitPredicateShouldWait;
+						mainSequence.WaitTimeout = child.WaitTimeout;
+						return true;
+					}
+
+					if ( cyclesDiff != 0 && child.IsDone( cyclesDiff ) )
+						child.ReportOnComplete();
+				}
+			}
+
+			if ( !IsAlive )
+			{
+				// A callback has stopped or completed the sequence, so its children can't be enumerated anymore
+				return true;
+			}
+		}
+
+		// Update the sequence root if no child suspended it
+		if ( UpdateAndSetElapsedTimeTotal( newElapsedTimeTotal, out int seqCyclesDiff, false ) )
+		{
+			bool isDone = IsDone( seqCyclesDiff );
+			if ( isDone && IsMainSequenceRoot() )
+			{
+				IsCompleting = true;
+				IsResetting = true;
+			}
+
+			ReportSequenceOnUpdate();
+			if ( isDone )
+			{
+				if ( IsMainSequenceRoot() )
+				{
+					if ( IsAlive && ResetOnComplete )
+						ResetSequence( Sequence );
+
+					IsResetting = false;
+					if ( !IsAlive )
+						return false;
+
+					if ( !IsPaused )
+						new Sequence( Sequence ).ReleaseTweens();
+					else
+						IsCompleting = false;
+
+					IsUpdating = false;
+				}
+				else if ( !IsAlive )
+				{
+					return false;
+				}
+
+				ReportOnComplete( false );
+			}
+		}
+
+		return false;
+	}
+
+	internal void ClearWait()
+	{
+		WaitPredicateTarget = null;
+		WaitPredicate = null;
+		WaitPredicateShouldWait = null;
 	}
 
 	internal static void ResetSequence( TweenData seq, bool toEnd = false )

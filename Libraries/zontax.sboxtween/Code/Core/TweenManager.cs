@@ -7,6 +7,10 @@ namespace SboxTween;
 public sealed class TweenManager : IDisposable
 {
 	internal static readonly object DummyTarget = new();
+	const float MaxDeltaTime = 10;
+
+	/// <summary>Incremented on every update pass, so a manual <see cref="Tween.Clock"/> applies its ticks once per pass.</summary>
+	internal static int UpdatePassCount;
 	static long _lastId = 1;
 	static TweenManager _scopeOverride;
 
@@ -128,6 +132,22 @@ public sealed class TweenManager : IDisposable
 		if ( IsDisposed )
 			return;
 
+		if ( UpdateDepth != 0 )
+		{
+			TweenLog.Error( $"{nameof( TweenManager )}.{nameof( Update )}() can't be called from animation callbacks." );
+			return;
+		}
+
+		if ( float.IsNaN( deltaTime ) || float.IsNaN( unscaledDeltaTime ) )
+		{
+			TweenLog.Error( $"Invalid deltaTime ({deltaTime}) or unscaledDeltaTime ({unscaledDeltaTime})." );
+			return;
+		}
+
+		// With the max timeScale and the min duration, a bigger delta would overflow the number of done cycles
+		deltaTime = MathF.Min( deltaTime, MaxDeltaTime );
+		unscaledDeltaTime = MathF.Min( unscaledDeltaTime, MaxDeltaTime );
+
 		updateType = SanitizeUpdateType( updateType );
 		var running = _running[Index( updateType )];
 		switch ( updateType )
@@ -166,6 +186,7 @@ public sealed class TweenManager : IDisposable
 				if ( tween is not null
 					&& tween.IsAlive
 					&& !tween.StartFromCurrent
+					&& !tween.IsAdditive
 					&& tween.StartDelay == 0
 					&& tween.CanManipulate()
 					&& tween.ElapsedTimeTotal == 0 )
@@ -186,6 +207,7 @@ public sealed class TweenManager : IDisposable
 	void UpdateTweenList( List<TweenData> list, float deltaTime, float unscaledDeltaTime )
 	{
 		UpdateDepth++;
+		UpdatePassCount++;
 		int count = list.Count;
 		int numRemoved = 0;
 		try
