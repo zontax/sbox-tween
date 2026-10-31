@@ -16,6 +16,22 @@ public class CodeGeneratorTests
 	[TestMethod]
 	public void PanelExtensionsFileIsUpToDate() => AssertSame( TweenCodeGenerator.PanelExtensionsFileName, TweenCodeGenerator.GeneratePanelExtensions() );
 
+	[TestMethod]
+	public void ComponentExtensionsFileIsUpToDate() => AssertSame( TweenCodeGenerator.ComponentExtensionsFileName, TweenCodeGenerator.GenerateComponentExtensions() );
+
+	[TestMethod]
+	public void AccessorsFileIsUpToDate() => AssertSame( Path.Combine( "..", "Internal", TweenCodeGenerator.AccessorsFileName ), TweenCodeGenerator.GenerateAccessors() );
+
+	/// <summary>
+	/// Writes the generated files without the editor: run this test with the environment variable SBOXTWEEN_REGENERATE=1.
+	/// </summary>
+	[TestMethod]
+	public void RegenerateWhenRequested()
+	{
+		if ( Environment.GetEnvironmentVariable( "SBOXTWEEN_REGENERATE" ) == "1" )
+			TweenCodeGenerator.WriteFiles( ApiDirectory() );
+	}
+
 	static void AssertSame( string fileName, string generated )
 	{
 		var path = Path.Combine( ApiDirectory(), fileName );

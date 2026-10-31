@@ -19,10 +19,10 @@ GameObject.TweenLocalPositionZ( 100, 1, Ease.OutBack );
 Tween.LocalRotation( GameObject, new Angles( 0, 90, 0 ), 1 );
 Tween.LocalAngles( GameObject, Angles.Zero, new Angles( 0, 360, 0 ), 1, cycles: -1 );
 
-// Components
+// Components, with a static method or an extension method
 Tween.Color( modelRenderer, Color.Red, 0.5f );
-Tween.LightRadius( pointLight, 300, 1 );
-Tween.CameraFieldOfView( camera, 90, 0.3f );
+pointLight.TweenRadius( 300, 1 );
+camera.TweenFieldOfView( 90, 0.3f );
 
 // Anything else
 Tween.Custom( this, 0, 10, 1, static ( self, value ) => self.Value = value );
@@ -143,6 +143,79 @@ How it works with the s&box UI:
 - **CSS transitions.** A `transition` on the same property restarts on every tween update and makes the tween lag. SboxTween warns about it (`TweenConfig.WarnPanelTransitions`) and marks such tweens in the Tween Debugger.
 - **Lengths** keep their units; start and end values must use the same unit. Starting from the current value reads the inline style first, then the computed style.
 
+## Components
+
+Every component tween has a static `Tween.X( component, … )` method and a `component.TweenX( … )` extension method.
+
+```csharp
+light.TweenIntensity( 4, 0.5f );
+light.TweenTemperature( 1800, 12000, 3, cycles: -1, cycleMode: CycleMode.Yoyo ); // Kelvin
+sun.TweenSkyColor( Color.Black, 2 );
+camera.TweenBackgroundColor( Color.Black, 1 );
+text.TweenFontSize( 96, 0.4f, Ease.OutBack );
+
+// Post-processing components on the camera
+vignette.TweenIntensity( 0.8f, 0.1f );
+aberration.TweenScale( 1, 0.1f );
+adjustments.TweenSaturation( 0, 1 );
+blur.TweenSize( 0.5f, 0.3f );
+fog.TweenColor( Color.Gray, 2 );
+volume.TweenBlendWeight( 1, 0.5f );
+```
+
+Supported: tint and alpha of any `ITintable` (ModelRenderer, Light, …), SpriteRenderer, TextRenderer (color, alpha, font size, scale), lights (intensity, temperature, radius, cone, ambient color, sun sky color), camera (field of view, orthographic height, near/far planes, background color), sounds, Bloom, Vignette, ColorAdjustments, ChromaticAberration, Blur, Pixelate, FilmGrain, DepthOfField, MotionBlur, Sharpen, Fog, VolumetricFogVolume and PostProcessVolume.
+
+## Shader attributes, animgraph and morphs
+
+Values without a property of their own are animated by name.
+
+```csharp
+// Renderer.Attributes: float, Vector3, Vector4 and Color (stored as float4)
+renderer.TweenAttribute( "Dissolve", 0, 1, 1.2f );
+renderer.TweenAttribute( "GlowColor", Color.Black, Color.Cyan, 0.5f );
+
+// Animation graph parameters: float, Vector3 and Rotation
+citizen.TweenParameter( "duck", 1, 0.4f );
+citizen.TweenParameter( "aim_head", new Vector3( 1, -0.7f, 0 ), new Vector3( 1, 0.7f, 0 ), 2, cycles: -1, cycleMode: CycleMode.Yoyo );
+
+// Morphs (blend shapes)
+citizen.TweenMorph( "lipcornerpullerL", 1, 0.3f );
+```
+
+- A shader attribute that was never set reads as zero, and the renderer can't read the defaults from the shader or the material. Pass the start value when it matters. Set constant attributes in the shader (`Default()`) or the material rather than right after creating the renderer: the engine can recreate the scene object, and attributes set before that are lost. Tweens write every frame, so they aren't affected.
+- A tweened morph stays overridden after the tween ends; call `Morphs.Clear( name )` to give it back to the animation.
+
+## Properties by name
+
+`Tween.Property` animates any public property known to the TypeLibrary, including `[Property]` fields of your own components. It's the fallback for things that have no dedicated method.
+
+```csharp
+skybox.TweenProperty( "Tint", Color.Black, 1.5f );
+spinner.TweenProperty( "Speed", 900, 1.2f, Ease.InOutCubic );
+Tween.Property( myObject, "Offset", Vector3.Zero, new Vector3( 0, 0, 50 ), 1 );
+```
+
+The property is looked up once, when the tween starts; a missing property or a different type is reported as an error. The value is boxed on every update, so this allocates; prefer a typed method or `Tween.Custom` in hot paths.
+
+## Rigidbody
+
+```csharp
+body.TweenPosition( target, 1.2f, Ease.InOutCubic );
+body.TweenRotation( Rotation.FromYaw( 90 ), 0.8f );
+```
+
+Rigidbody tweens set the velocity (or the angular velocity) every fixed update, so the body reaches each point of the curve in one physics step and collides on the way instead of teleporting through other bodies. They always use `UpdateType.FixedUpdate`; create a sequence of them with `Sequence.Create( updateType: UpdateType.FixedUpdate )`. When the tween completes, the body is placed exactly at the end value and stopped; a stopped tween leaves the body with its current velocity. Use `Rigidbody.Locking` to keep the other axes still.
+
+## Typewriter
+
+```csharp
+sign.TweenTypewriter( "Hello, world!", 1.5f );           // TextRenderer
+label.TweenTypewriterAtSpeed( "Loading...", 30 );        // UI Label, characters per second
+Tween.Typewriter( sign, null, 1 );                       // types the current text
+```
+
+The typing pauses after sentences (`. ! ?`) and, shorter, after clauses (`, ; :`) when they're followed by a space; pass `pauseOnPunctuation: false` to type evenly. The default ease is linear. Every new visible character sets the text once, which allocates a string.
+
 ## Controlling tweens
 
 ```csharp
@@ -176,7 +249,7 @@ The **Editor → Sbox Tween** menu:
 - **Tween Debugger** opens the *Tweens* dock: every alive animation of the playing scene, with sequence children nested under their parent, progress, cycles and pause state. Click a target to select it, use the row buttons to pause, complete or stop an animation. *Max alive* helps to pick a value for `TweenManager.SetTweensCapacity()`.
 - **Pause / Resume / Complete / Stop All Tweens** act on the playing scene.
 - **Documentation** opens this file.
-- **Developer → Regenerate Tween API** regenerates `Code/Api/*.Generated.cs`.
+- **Developer → Regenerate Tween API** regenerates `Code/Api/*.Generated.cs` and `Code/Internal/TweenData.Generated.cs`.
 - **Developer → Run Benchmark** measures creation, updates and allocations in a temporary scene.
 
 ## Performance
@@ -201,10 +274,17 @@ Panel transforms allocate inside the engine: `PanelTransform` is an immutable li
 
 Running animations survive a hotload. Callbacks stored by the library are named methods rather than lambdas, because hotload matches methods by name and can fail to upgrade a lambda of a running animation. Callbacks from your code are upgraded together with your assembly; if a callback's type no longer matches after a reload, `OnUpdate` logs an error and isn't called again instead of throwing every frame.
 
+The same applies to your lambdas: when you edit the code around them, a running tween can lose its lambda callback ("Unable to find matching substitution for a lambda method"). Endless loops that restart themselves from `OnComplete` should use a named method:
+
+```csharp
+Tween.Delay( this, 2 ).OnComplete( this, OnTick ); // instead of static demo => demo.Tick()
+static void OnTick( MyComponent self ) => self.Tick();
+```
+
 ## Architecture notes
 
 - Every scene gets its own `TweenManager` through `TweenSystem`. Tweens die with their scene.
 - `UpdateType.Update` runs before components' `OnUpdate`, `LateUpdate` runs after it, `FixedUpdate` runs on fixed steps.
 - Destroying a GameObject with running tweens is safe: they stop on the next update.
-- Repetitive overloads are generated by `Editor/CodeGen/TweenCodeGenerator.cs`. To add an animatable property, add a row to its `Properties` table and a `TweenType` with a getter/setter in `Code/Internal/TweenData.Values.cs`, then run **Developer → Regenerate Tween API**. A unit test fails if the generated files are out of date.
+- Repetitive overloads, extension methods and simple getters/setters are generated by `Editor/CodeGen/TweenCodeGenerator.cs`. To add an animatable property, add a `TweenType` and a row to the `Properties` table: a row with `Member` gets a generated getter and setter (`Code/Internal/TweenData.Generated.cs`), other rows need one in `Code/Internal/TweenData.Values.cs`. Then run **Developer → Regenerate Tween API**, or `CodeGeneratorTests.RegenerateWhenRequested` with the environment variable `SBOXTWEEN_REGENERATE=1`. A unit test fails if the generated files are out of date.
 - Unit tests: `dotnet test` in `UnitTests`. Run them for the STANDALONE build too: `dotnet test -p:DefineConstants="SANDBOX%3BSTANDALONE"`. Benchmark: `dotnet test -c Release --filter TestCategory=Benchmark --logger "console;verbosity=detailed"`.

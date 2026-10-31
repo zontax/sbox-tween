@@ -2,10 +2,10 @@ namespace SboxTweenExample;
 
 /// <summary>
 /// Builds the SboxTween showcase: a row of stands, each demonstrating a group of features.
-/// The UI calls the public methods of this component.
+/// The camera flies between the stands, the UI calls the public methods of this component.
 /// </summary>
 [Title( "Tween Demo" ), Category( "SboxTween" ), Icon( "animation" )]
-public sealed class TweenDemo : Component
+public sealed partial class TweenDemo : Component
 {
 	const float StandSpacing = 145;
 
@@ -52,8 +52,8 @@ public sealed class TweenDemo : Component
 
 	protected override void OnStart()
 	{
-		
 		Rebuild();
+		SnapCamera();
 	}
 
 	/// <summary>Destroys and recreates all stands with their idle animations.</summary>
@@ -71,14 +71,24 @@ public sealed class TweenDemo : Component
 		BuildAsyncStand( StandPosition( 4 ) );
 		BuildSpeedStand( StandPosition( 5 ) );
 		BuildGateStand( StandPosition( 6 ) );
+		BuildShaderStand( StandPosition( 7 ) );
+		BuildCitizenStand( StandPosition( 8 ) );
+		BuildPostProcessStand( StandPosition( 9 ) );
+		BuildTypewriterStand( StandPosition( 10 ) );
+		BuildLightsStand( StandPosition( 11 ) );
+		BuildPhysicsStand( StandPosition( 12 ) );
 
 		IsPaused = false;
 		IsGateOpen = false;
 		IsRaceSlow = false;
+		if ( IsSlowMotion )
+			ToggleSlowMotion();
+
+		SnapCamera();
 		Report( "Demo rebuilt" );
 	}
 
-	static Vector3 StandPosition( int index ) => new( 0, (3 - index) * StandSpacing, 0 );
+	static Vector3 StandPosition( int index ) => new( 0, ((Stands.Length - 1) * 0.5f - index) * StandSpacing, 0 );
 
 	#region Stands
 
@@ -176,13 +186,18 @@ public sealed class TweenDemo : Component
 		_gateSequence = Sequence.Create()
 			.Chain( Tween.LocalPositionZ( _gateBox, 25, 150, 0.6f, Ease.OutBack ) )
 			.Group( Tween.Color( renderer, "#ffb84d", 0.3f ) )
-			.ChainWaitUntil( this, static demo => demo.IsGateOpen )
+			.ChainWaitUntil( this, IsGateOpened )
 			.Chain( Tween.Color( renderer, "#6bf178", 0.2f ) )
 			.Chain( Tween.LocalPositionZ( _gateBox, 150, 25, 0.5f, Ease.OutBounce ) )
-			.ChainCallback( this, static demo => demo.IsGateOpen = false )
+			.ChainCallback( this, CloseGate )
 			.ChainDelay( 0.3f )
-			.OnComplete( this, static demo => demo.PlayGateLoop() );
+			.OnComplete( this, RestartGateLoop );
 	}
+
+	// Endless loops use named methods: a hotload can't always match the lambdas of a running tween
+	static bool IsGateOpened( TweenDemo demo ) => demo.IsGateOpen;
+	static void CloseGate( TweenDemo demo ) => demo.IsGateOpen = false;
+	static void RestartGateLoop( TweenDemo demo ) => demo.PlayGateLoop();
 
 	async Task RunAsyncLoop( GameObject box )
 	{
@@ -335,7 +350,8 @@ public sealed class TweenDemo : Component
 	{
 		var floor = CreateModel( _root, "models/dev/box.vmdl", new Vector3( 0, 0, -5 ), 1, "#2a2f3a" );
 		floor.Name = "Floor";
-		floor.LocalScale = new Vector3( 8, 22, 0.2f );
+		floor.LocalScale = new Vector3( 8, Stands.Length * StandSpacing / 50 + 2, 0.2f );
+		AddBoxCollider( floor );
 	}
 
 	GameObject CreateStand( string title, Vector3 position )
@@ -346,6 +362,7 @@ public sealed class TweenDemo : Component
 		var pad = CreateModel( stand, "models/dev/box.vmdl", new Vector3( 0, 0, 1 ), 1, "#3b4252" );
 		pad.Name = "Pad";
 		pad.LocalScale = new Vector3( 2.4f, 2.6f, 0.08f );
+		AddBoxCollider( pad );
 
 		CreateLabel( stand, title, new Vector3( 0, 0, 230 ), 0.22f );
 		return stand;
@@ -360,6 +377,16 @@ public sealed class TweenDemo : Component
 		renderer.Model = Model.Load( model );
 		renderer.Tint = tint;
 		return go;
+	}
+
+	/// <summary>A collider that matches the bounds of the object's model.</summary>
+	static BoxCollider AddBoxCollider( GameObject go )
+	{
+		var bounds = go.Components.Get<ModelRenderer>().Model.Bounds;
+		var collider = go.Components.Create<BoxCollider>();
+		collider.Scale = bounds.Size;
+		collider.Center = bounds.Center;
+		return collider;
 	}
 
 	static TextRenderer CreateLabel( GameObject parent, string text, Vector3 position, float scale )

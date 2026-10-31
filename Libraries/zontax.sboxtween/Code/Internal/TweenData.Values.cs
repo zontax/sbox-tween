@@ -44,7 +44,13 @@ internal sealed partial class TweenData
 				return PanelTweens.GetPropType( tweenType );
 
 			default:
-				return PropType.Float;
+			{
+				var propType = GetGeneratedPropType( tweenType );
+				if ( propType == PropType.None )
+					propType = GetNamedPropType( tweenType );
+
+				return propType == PropType.None ? PropType.Float : propType;
+			}
 		}
 	}
 
@@ -107,6 +113,9 @@ internal sealed partial class TweenData
 			default:
 				if ( PanelTweens.IsPanelType( TweenType ) )
 					return PanelTweens.Get( this );
+
+				if ( TryGetGeneratedValue( out var value ) || TryGetNamedValue( out value ) )
+					return value;
 
 				throw new InvalidOperationException( $"Tween type {TweenType} doesn't support reading the current value." );
 		}
@@ -256,10 +265,15 @@ internal sealed partial class TweenData
 			case TweenType.SoundHandlePitch: (target as SoundHandle).Pitch = FloatVal(); break;
 
 			default:
-				if ( !PanelTweens.IsPanelType( TweenType ) )
+				if ( PanelTweens.IsPanelType( TweenType ) )
+				{
+					PanelTweens.Set( this );
+					break;
+				}
+
+				if ( !TrySetGeneratedValue() && !TrySetNamedValue() )
 					throw new InvalidOperationException( $"Tween type {TweenType} doesn't support setting the value." );
 
-				PanelTweens.Set( this );
 				break;
 		}
 

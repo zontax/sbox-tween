@@ -177,14 +177,14 @@ public readonly partial struct Tween
 /// </summary>
 static class AdditiveInvokers<T> where T : class
 {
-	// Named methods instead of lambdas, so hotload can upgrade the invokers of running tweens
-	internal static readonly Action<TweenData> FloatDelta = InvokeFloat;
-	internal static readonly Action<TweenData> Vector2Delta = InvokeVector2;
-	internal static readonly Action<TweenData> Vector3Delta = InvokeVector3;
-	internal static readonly Action<TweenData> Vector4Delta = InvokeVector4;
-	internal static readonly Action<TweenData> ColorDelta = InvokeColor;
-	internal static readonly Action<TweenData> RotationDelta = InvokeRotation;
-	internal static readonly Action<TweenData> EulerRotation = InvokeEulerRotation;
+	// Named methods instead of lambdas, so hotload can upgrade the invokers of running tweens. The fields are initialized again by the new assembly
+	[SkipHotload] internal static readonly Action<TweenData> FloatDelta = InvokeFloat;
+	[SkipHotload] internal static readonly Action<TweenData> Vector2Delta = InvokeVector2;
+	[SkipHotload] internal static readonly Action<TweenData> Vector3Delta = InvokeVector3;
+	[SkipHotload] internal static readonly Action<TweenData> Vector4Delta = InvokeVector4;
+	[SkipHotload] internal static readonly Action<TweenData> ColorDelta = InvokeColor;
+	[SkipHotload] internal static readonly Action<TweenData> RotationDelta = InvokeRotation;
+	[SkipHotload] internal static readonly Action<TweenData> EulerRotation = InvokeEulerRotation;
 
 	static void InvokeFloat( TweenData d ) => Linear( d, ToFloat, FromFloat );
 	static void InvokeVector2( TweenData d ) => Linear( d, ToVector2, FromVector2 );

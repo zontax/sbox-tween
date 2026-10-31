@@ -65,8 +65,16 @@ public readonly struct TweenDebugEntry
 			TweenType.PointLightRadius or TweenType.SpotLightRadius => "LightRadius",
 			TweenType.SoundHandleVolume => "SoundVolume",
 			TweenType.SoundHandlePitch => "SoundPitch",
+			TweenType.AmbientLightColor or TweenType.VignetteColor or TweenType.FogColor or TweenType.VolumetricFogColor => "Color",
+			>= TweenType.RendererAttributeFloat and <= TweenType.RendererAttributeColor => "Attribute",
+			>= TweenType.AnimParameterFloat and <= TweenType.AnimParameterRotation => "AnimParameter",
+			>= TweenType.PropertyFloat and <= TweenType.PropertyAngles => "Property",
+			TweenType.TextTypewriter or TweenType.LabelTypewriter => "Typewriter",
 			_ => data.TweenType.ToString()
 		};
+
+		if ( TweenData.IsNamed( data.TweenType ) )
+			Name += $" '{data.ParameterName}'";
 
 		if ( data.IsAdditive )
 			Name += " (additive)";

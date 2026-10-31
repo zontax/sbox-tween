@@ -334,6 +334,34 @@ public readonly partial struct Tween
 	/// <summary>Animates the alpha of a TextRenderer.</summary>
 	public static Tween Alpha( TextRenderer target, TweenSettings<float> settings ) => Animate( target, TweenType.TextAlpha, settings );
 
+	/// <inheritdoc cref="Tween.TextFontSize(TextRenderer, TweenSettings{float})"/>
+	public static Tween TextFontSize( TextRenderer target, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> TextFontSize( target, new TweenSettings<float>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.TextFontSize(TextRenderer, TweenSettings{float})"/>
+	public static Tween TextFontSize( TextRenderer target, float startValue, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> TextFontSize( target, new TweenSettings<float>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.TextFontSize(TextRenderer, TweenSettings{float})"/>
+	public static Tween TextFontSize( TextRenderer target, float endValue, TweenSettings settings ) => TextFontSize( target, new TweenSettings<float>( endValue, settings ) );
+
+	/// <summary>Animates the font size of a TextRenderer.</summary>
+	public static Tween TextFontSize( TextRenderer target, TweenSettings<float> settings ) => Animate( target, TweenType.TextFontSize, settings );
+
+	/// <inheritdoc cref="Tween.TextScale(TextRenderer, TweenSettings{float})"/>
+	public static Tween TextScale( TextRenderer target, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> TextScale( target, new TweenSettings<float>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.TextScale(TextRenderer, TweenSettings{float})"/>
+	public static Tween TextScale( TextRenderer target, float startValue, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> TextScale( target, new TweenSettings<float>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.TextScale(TextRenderer, TweenSettings{float})"/>
+	public static Tween TextScale( TextRenderer target, float endValue, TweenSettings settings ) => TextScale( target, new TweenSettings<float>( endValue, settings ) );
+
+	/// <summary>Animates the scale of a TextRenderer.</summary>
+	public static Tween TextScale( TextRenderer target, TweenSettings<float> settings ) => Animate( target, TweenType.TextScale, settings );
+
 	/// <inheritdoc cref="Tween.LightRadius(PointLight, TweenSettings{float})"/>
 	public static Tween LightRadius( PointLight target, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
 		=> LightRadius( target, new TweenSettings<float>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
@@ -390,6 +418,62 @@ public readonly partial struct Tween
 	/// <summary>Animates the inner cone angle of a SpotLight.</summary>
 	public static Tween SpotLightConeInner( SpotLight target, TweenSettings<float> settings ) => Animate( target, TweenType.SpotLightConeInner, settings );
 
+	/// <inheritdoc cref="Tween.LightIntensity(Light, TweenSettings{float})"/>
+	public static Tween LightIntensity( Light target, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> LightIntensity( target, new TweenSettings<float>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.LightIntensity(Light, TweenSettings{float})"/>
+	public static Tween LightIntensity( Light target, float startValue, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> LightIntensity( target, new TweenSettings<float>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.LightIntensity(Light, TweenSettings{float})"/>
+	public static Tween LightIntensity( Light target, float endValue, TweenSettings settings ) => LightIntensity( target, new TweenSettings<float>( endValue, settings ) );
+
+	/// <summary>Animates the brightness multiplier of a light.</summary>
+	public static Tween LightIntensity( Light target, TweenSettings<float> settings ) => Animate( target, TweenType.LightIntensity, settings );
+
+	/// <inheritdoc cref="Tween.LightTemperature(Light, TweenSettings{float})"/>
+	public static Tween LightTemperature( Light target, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> LightTemperature( target, new TweenSettings<float>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.LightTemperature(Light, TweenSettings{float})"/>
+	public static Tween LightTemperature( Light target, float startValue, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> LightTemperature( target, new TweenSettings<float>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.LightTemperature(Light, TweenSettings{float})"/>
+	public static Tween LightTemperature( Light target, float endValue, TweenSettings settings ) => LightTemperature( target, new TweenSettings<float>( endValue, settings ) );
+
+	/// <summary>Animates the color temperature of a light, in Kelvin (1000 is warm red, 6500 is neutral, 12000 is cold blue).</summary>
+	public static Tween LightTemperature( Light target, TweenSettings<float> settings ) => Animate( target, TweenType.LightTemperature, settings );
+
+	/// <inheritdoc cref="Tween.Color(AmbientLight, TweenSettings{Color})"/>
+	public static Tween Color( AmbientLight target, Color endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> Color( target, new TweenSettings<Color>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.Color(AmbientLight, TweenSettings{Color})"/>
+	public static Tween Color( AmbientLight target, Color startValue, Color endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> Color( target, new TweenSettings<Color>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.Color(AmbientLight, TweenSettings{Color})"/>
+	public static Tween Color( AmbientLight target, Color endValue, TweenSettings settings ) => Color( target, new TweenSettings<Color>( endValue, settings ) );
+
+	/// <summary>Animates the color of an AmbientLight.</summary>
+	public static Tween Color( AmbientLight target, TweenSettings<Color> settings ) => Animate( target, TweenType.AmbientLightColor, settings );
+
+	/// <inheritdoc cref="Tween.DirectionalLightSkyColor(DirectionalLight, TweenSettings{Color})"/>
+	public static Tween DirectionalLightSkyColor( DirectionalLight target, Color endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> DirectionalLightSkyColor( target, new TweenSettings<Color>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.DirectionalLightSkyColor(DirectionalLight, TweenSettings{Color})"/>
+	public static Tween DirectionalLightSkyColor( DirectionalLight target, Color startValue, Color endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> DirectionalLightSkyColor( target, new TweenSettings<Color>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.DirectionalLightSkyColor(DirectionalLight, TweenSettings{Color})"/>
+	public static Tween DirectionalLightSkyColor( DirectionalLight target, Color endValue, TweenSettings settings ) => DirectionalLightSkyColor( target, new TweenSettings<Color>( endValue, settings ) );
+
+	/// <summary>Animates the sky (ambient) color of a DirectionalLight.</summary>
+	public static Tween DirectionalLightSkyColor( DirectionalLight target, TweenSettings<Color> settings ) => Animate( target, TweenType.DirectionalLightSkyColor, settings );
+
 	/// <inheritdoc cref="Tween.CameraFieldOfView(CameraComponent, TweenSettings{float})"/>
 	public static Tween CameraFieldOfView( CameraComponent target, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
 		=> CameraFieldOfView( target, new TweenSettings<float>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
@@ -417,6 +501,48 @@ public readonly partial struct Tween
 
 	/// <summary>Animates the orthographic height of a camera.</summary>
 	public static Tween CameraOrthographicHeight( CameraComponent target, TweenSettings<float> settings ) => Animate( target, TweenType.CameraOrthographicHeight, settings );
+
+	/// <inheritdoc cref="Tween.CameraZNear(CameraComponent, TweenSettings{float})"/>
+	public static Tween CameraZNear( CameraComponent target, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> CameraZNear( target, new TweenSettings<float>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.CameraZNear(CameraComponent, TweenSettings{float})"/>
+	public static Tween CameraZNear( CameraComponent target, float startValue, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> CameraZNear( target, new TweenSettings<float>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.CameraZNear(CameraComponent, TweenSettings{float})"/>
+	public static Tween CameraZNear( CameraComponent target, float endValue, TweenSettings settings ) => CameraZNear( target, new TweenSettings<float>( endValue, settings ) );
+
+	/// <summary>Animates the near clipping plane of a camera.</summary>
+	public static Tween CameraZNear( CameraComponent target, TweenSettings<float> settings ) => Animate( target, TweenType.CameraZNear, settings );
+
+	/// <inheritdoc cref="Tween.CameraZFar(CameraComponent, TweenSettings{float})"/>
+	public static Tween CameraZFar( CameraComponent target, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> CameraZFar( target, new TweenSettings<float>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.CameraZFar(CameraComponent, TweenSettings{float})"/>
+	public static Tween CameraZFar( CameraComponent target, float startValue, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> CameraZFar( target, new TweenSettings<float>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.CameraZFar(CameraComponent, TweenSettings{float})"/>
+	public static Tween CameraZFar( CameraComponent target, float endValue, TweenSettings settings ) => CameraZFar( target, new TweenSettings<float>( endValue, settings ) );
+
+	/// <summary>Animates the far clipping plane of a camera.</summary>
+	public static Tween CameraZFar( CameraComponent target, TweenSettings<float> settings ) => Animate( target, TweenType.CameraZFar, settings );
+
+	/// <inheritdoc cref="Tween.CameraBackgroundColor(CameraComponent, TweenSettings{Color})"/>
+	public static Tween CameraBackgroundColor( CameraComponent target, Color endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> CameraBackgroundColor( target, new TweenSettings<Color>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.CameraBackgroundColor(CameraComponent, TweenSettings{Color})"/>
+	public static Tween CameraBackgroundColor( CameraComponent target, Color startValue, Color endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> CameraBackgroundColor( target, new TweenSettings<Color>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.CameraBackgroundColor(CameraComponent, TweenSettings{Color})"/>
+	public static Tween CameraBackgroundColor( CameraComponent target, Color endValue, TweenSettings settings ) => CameraBackgroundColor( target, new TweenSettings<Color>( endValue, settings ) );
+
+	/// <summary>Animates the background color of a camera.</summary>
+	public static Tween CameraBackgroundColor( CameraComponent target, TweenSettings<Color> settings ) => Animate( target, TweenType.CameraBackgroundColor, settings );
 
 	/// <inheritdoc cref="Tween.SoundVolume(BaseSoundComponent, TweenSettings{float})"/>
 	public static Tween SoundVolume( BaseSoundComponent target, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
@@ -473,6 +599,625 @@ public readonly partial struct Tween
 
 	/// <summary>Animates the pitch of a playing sound.</summary>
 	public static Tween SoundPitch( SoundHandle target, TweenSettings<float> settings ) => Animate( target, TweenType.SoundHandlePitch, settings );
+
+	/// <inheritdoc cref="Tween.BloomStrength(Bloom, TweenSettings{float})"/>
+	public static Tween BloomStrength( Bloom target, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> BloomStrength( target, new TweenSettings<float>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.BloomStrength(Bloom, TweenSettings{float})"/>
+	public static Tween BloomStrength( Bloom target, float startValue, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> BloomStrength( target, new TweenSettings<float>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.BloomStrength(Bloom, TweenSettings{float})"/>
+	public static Tween BloomStrength( Bloom target, float endValue, TweenSettings settings ) => BloomStrength( target, new TweenSettings<float>( endValue, settings ) );
+
+	/// <summary>Animates the strength of the Bloom post-process effect.</summary>
+	public static Tween BloomStrength( Bloom target, TweenSettings<float> settings ) => Animate( target, TweenType.BloomStrength, settings );
+
+	/// <inheritdoc cref="Tween.BloomThreshold(Bloom, TweenSettings{float})"/>
+	public static Tween BloomThreshold( Bloom target, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> BloomThreshold( target, new TweenSettings<float>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.BloomThreshold(Bloom, TweenSettings{float})"/>
+	public static Tween BloomThreshold( Bloom target, float startValue, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> BloomThreshold( target, new TweenSettings<float>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.BloomThreshold(Bloom, TweenSettings{float})"/>
+	public static Tween BloomThreshold( Bloom target, float endValue, TweenSettings settings ) => BloomThreshold( target, new TweenSettings<float>( endValue, settings ) );
+
+	/// <summary>Animates the brightness threshold of the Bloom post-process effect.</summary>
+	public static Tween BloomThreshold( Bloom target, TweenSettings<float> settings ) => Animate( target, TweenType.BloomThreshold, settings );
+
+	/// <inheritdoc cref="Tween.BloomTint(Bloom, TweenSettings{Color})"/>
+	public static Tween BloomTint( Bloom target, Color endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> BloomTint( target, new TweenSettings<Color>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.BloomTint(Bloom, TweenSettings{Color})"/>
+	public static Tween BloomTint( Bloom target, Color startValue, Color endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> BloomTint( target, new TweenSettings<Color>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.BloomTint(Bloom, TweenSettings{Color})"/>
+	public static Tween BloomTint( Bloom target, Color endValue, TweenSettings settings ) => BloomTint( target, new TweenSettings<Color>( endValue, settings ) );
+
+	/// <summary>Animates the tint of the Bloom post-process effect.</summary>
+	public static Tween BloomTint( Bloom target, TweenSettings<Color> settings ) => Animate( target, TweenType.BloomTint, settings );
+
+	/// <inheritdoc cref="Tween.VignetteIntensity(Vignette, TweenSettings{float})"/>
+	public static Tween VignetteIntensity( Vignette target, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> VignetteIntensity( target, new TweenSettings<float>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.VignetteIntensity(Vignette, TweenSettings{float})"/>
+	public static Tween VignetteIntensity( Vignette target, float startValue, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> VignetteIntensity( target, new TweenSettings<float>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.VignetteIntensity(Vignette, TweenSettings{float})"/>
+	public static Tween VignetteIntensity( Vignette target, float endValue, TweenSettings settings ) => VignetteIntensity( target, new TweenSettings<float>( endValue, settings ) );
+
+	/// <summary>Animates the intensity of the Vignette post-process effect, from 0 to 1.</summary>
+	public static Tween VignetteIntensity( Vignette target, TweenSettings<float> settings ) => Animate( target, TweenType.VignetteIntensity, settings );
+
+	/// <inheritdoc cref="Tween.VignetteSmoothness(Vignette, TweenSettings{float})"/>
+	public static Tween VignetteSmoothness( Vignette target, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> VignetteSmoothness( target, new TweenSettings<float>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.VignetteSmoothness(Vignette, TweenSettings{float})"/>
+	public static Tween VignetteSmoothness( Vignette target, float startValue, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> VignetteSmoothness( target, new TweenSettings<float>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.VignetteSmoothness(Vignette, TweenSettings{float})"/>
+	public static Tween VignetteSmoothness( Vignette target, float endValue, TweenSettings settings ) => VignetteSmoothness( target, new TweenSettings<float>( endValue, settings ) );
+
+	/// <summary>Animates the smoothness of the Vignette post-process effect, from 0 to 1.</summary>
+	public static Tween VignetteSmoothness( Vignette target, TweenSettings<float> settings ) => Animate( target, TweenType.VignetteSmoothness, settings );
+
+	/// <inheritdoc cref="Tween.Color(Vignette, TweenSettings{Color})"/>
+	public static Tween Color( Vignette target, Color endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> Color( target, new TweenSettings<Color>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.Color(Vignette, TweenSettings{Color})"/>
+	public static Tween Color( Vignette target, Color startValue, Color endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> Color( target, new TweenSettings<Color>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.Color(Vignette, TweenSettings{Color})"/>
+	public static Tween Color( Vignette target, Color endValue, TweenSettings settings ) => Color( target, new TweenSettings<Color>( endValue, settings ) );
+
+	/// <summary>Animates the color of the Vignette post-process effect.</summary>
+	public static Tween Color( Vignette target, TweenSettings<Color> settings ) => Animate( target, TweenType.VignetteColor, settings );
+
+	/// <inheritdoc cref="Tween.ColorAdjustmentsBlend(ColorAdjustments, TweenSettings{float})"/>
+	public static Tween ColorAdjustmentsBlend( ColorAdjustments target, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> ColorAdjustmentsBlend( target, new TweenSettings<float>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.ColorAdjustmentsBlend(ColorAdjustments, TweenSettings{float})"/>
+	public static Tween ColorAdjustmentsBlend( ColorAdjustments target, float startValue, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> ColorAdjustmentsBlend( target, new TweenSettings<float>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.ColorAdjustmentsBlend(ColorAdjustments, TweenSettings{float})"/>
+	public static Tween ColorAdjustmentsBlend( ColorAdjustments target, float endValue, TweenSettings settings ) => ColorAdjustmentsBlend( target, new TweenSettings<float>( endValue, settings ) );
+
+	/// <summary>Animates how much the ColorAdjustments post-process effect is applied, from 0 to 1.</summary>
+	public static Tween ColorAdjustmentsBlend( ColorAdjustments target, TweenSettings<float> settings ) => Animate( target, TweenType.ColorAdjustmentsBlend, settings );
+
+	/// <inheritdoc cref="Tween.ColorAdjustmentsSaturation(ColorAdjustments, TweenSettings{float})"/>
+	public static Tween ColorAdjustmentsSaturation( ColorAdjustments target, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> ColorAdjustmentsSaturation( target, new TweenSettings<float>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.ColorAdjustmentsSaturation(ColorAdjustments, TweenSettings{float})"/>
+	public static Tween ColorAdjustmentsSaturation( ColorAdjustments target, float startValue, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> ColorAdjustmentsSaturation( target, new TweenSettings<float>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.ColorAdjustmentsSaturation(ColorAdjustments, TweenSettings{float})"/>
+	public static Tween ColorAdjustmentsSaturation( ColorAdjustments target, float endValue, TweenSettings settings ) => ColorAdjustmentsSaturation( target, new TweenSettings<float>( endValue, settings ) );
+
+	/// <summary>Animates the saturation of the ColorAdjustments post-process effect, where 1 is unchanged and 0 is grayscale.</summary>
+	public static Tween ColorAdjustmentsSaturation( ColorAdjustments target, TweenSettings<float> settings ) => Animate( target, TweenType.ColorAdjustmentsSaturation, settings );
+
+	/// <inheritdoc cref="Tween.ColorAdjustmentsHueRotate(ColorAdjustments, TweenSettings{float})"/>
+	public static Tween ColorAdjustmentsHueRotate( ColorAdjustments target, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> ColorAdjustmentsHueRotate( target, new TweenSettings<float>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.ColorAdjustmentsHueRotate(ColorAdjustments, TweenSettings{float})"/>
+	public static Tween ColorAdjustmentsHueRotate( ColorAdjustments target, float startValue, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> ColorAdjustmentsHueRotate( target, new TweenSettings<float>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.ColorAdjustmentsHueRotate(ColorAdjustments, TweenSettings{float})"/>
+	public static Tween ColorAdjustmentsHueRotate( ColorAdjustments target, float endValue, TweenSettings settings ) => ColorAdjustmentsHueRotate( target, new TweenSettings<float>( endValue, settings ) );
+
+	/// <summary>Animates the hue rotation of the ColorAdjustments post-process effect, in degrees.</summary>
+	public static Tween ColorAdjustmentsHueRotate( ColorAdjustments target, TweenSettings<float> settings ) => Animate( target, TweenType.ColorAdjustmentsHueRotate, settings );
+
+	/// <inheritdoc cref="Tween.ColorAdjustmentsBrightness(ColorAdjustments, TweenSettings{float})"/>
+	public static Tween ColorAdjustmentsBrightness( ColorAdjustments target, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> ColorAdjustmentsBrightness( target, new TweenSettings<float>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.ColorAdjustmentsBrightness(ColorAdjustments, TweenSettings{float})"/>
+	public static Tween ColorAdjustmentsBrightness( ColorAdjustments target, float startValue, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> ColorAdjustmentsBrightness( target, new TweenSettings<float>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.ColorAdjustmentsBrightness(ColorAdjustments, TweenSettings{float})"/>
+	public static Tween ColorAdjustmentsBrightness( ColorAdjustments target, float endValue, TweenSettings settings ) => ColorAdjustmentsBrightness( target, new TweenSettings<float>( endValue, settings ) );
+
+	/// <summary>Animates the brightness of the ColorAdjustments post-process effect, where 1 is unchanged.</summary>
+	public static Tween ColorAdjustmentsBrightness( ColorAdjustments target, TweenSettings<float> settings ) => Animate( target, TweenType.ColorAdjustmentsBrightness, settings );
+
+	/// <inheritdoc cref="Tween.ColorAdjustmentsContrast(ColorAdjustments, TweenSettings{float})"/>
+	public static Tween ColorAdjustmentsContrast( ColorAdjustments target, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> ColorAdjustmentsContrast( target, new TweenSettings<float>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.ColorAdjustmentsContrast(ColorAdjustments, TweenSettings{float})"/>
+	public static Tween ColorAdjustmentsContrast( ColorAdjustments target, float startValue, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> ColorAdjustmentsContrast( target, new TweenSettings<float>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.ColorAdjustmentsContrast(ColorAdjustments, TweenSettings{float})"/>
+	public static Tween ColorAdjustmentsContrast( ColorAdjustments target, float endValue, TweenSettings settings ) => ColorAdjustmentsContrast( target, new TweenSettings<float>( endValue, settings ) );
+
+	/// <summary>Animates the contrast of the ColorAdjustments post-process effect, where 1 is unchanged.</summary>
+	public static Tween ColorAdjustmentsContrast( ColorAdjustments target, TweenSettings<float> settings ) => Animate( target, TweenType.ColorAdjustmentsContrast, settings );
+
+	/// <inheritdoc cref="Tween.ChromaticAberrationScale(ChromaticAberration, TweenSettings{float})"/>
+	public static Tween ChromaticAberrationScale( ChromaticAberration target, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> ChromaticAberrationScale( target, new TweenSettings<float>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.ChromaticAberrationScale(ChromaticAberration, TweenSettings{float})"/>
+	public static Tween ChromaticAberrationScale( ChromaticAberration target, float startValue, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> ChromaticAberrationScale( target, new TweenSettings<float>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.ChromaticAberrationScale(ChromaticAberration, TweenSettings{float})"/>
+	public static Tween ChromaticAberrationScale( ChromaticAberration target, float endValue, TweenSettings settings ) => ChromaticAberrationScale( target, new TweenSettings<float>( endValue, settings ) );
+
+	/// <summary>Animates the strength of the ChromaticAberration post-process effect, from 0 to 1.</summary>
+	public static Tween ChromaticAberrationScale( ChromaticAberration target, TweenSettings<float> settings ) => Animate( target, TweenType.ChromaticAberrationScale, settings );
+
+	/// <inheritdoc cref="Tween.BlurSize(Blur, TweenSettings{float})"/>
+	public static Tween BlurSize( Blur target, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> BlurSize( target, new TweenSettings<float>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.BlurSize(Blur, TweenSettings{float})"/>
+	public static Tween BlurSize( Blur target, float startValue, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> BlurSize( target, new TweenSettings<float>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.BlurSize(Blur, TweenSettings{float})"/>
+	public static Tween BlurSize( Blur target, float endValue, TweenSettings settings ) => BlurSize( target, new TweenSettings<float>( endValue, settings ) );
+
+	/// <summary>Animates the size of the Blur post-process effect, from 0 to 1.</summary>
+	public static Tween BlurSize( Blur target, TweenSettings<float> settings ) => Animate( target, TweenType.BlurSize, settings );
+
+	/// <inheritdoc cref="Tween.PixelateScale(Pixelate, TweenSettings{float})"/>
+	public static Tween PixelateScale( Pixelate target, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> PixelateScale( target, new TweenSettings<float>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.PixelateScale(Pixelate, TweenSettings{float})"/>
+	public static Tween PixelateScale( Pixelate target, float startValue, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> PixelateScale( target, new TweenSettings<float>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.PixelateScale(Pixelate, TweenSettings{float})"/>
+	public static Tween PixelateScale( Pixelate target, float endValue, TweenSettings settings ) => PixelateScale( target, new TweenSettings<float>( endValue, settings ) );
+
+	/// <summary>Animates the pixel scale of the Pixelate post-process effect.</summary>
+	public static Tween PixelateScale( Pixelate target, TweenSettings<float> settings ) => Animate( target, TweenType.PixelateScale, settings );
+
+	/// <inheritdoc cref="Tween.FilmGrainIntensity(FilmGrain, TweenSettings{float})"/>
+	public static Tween FilmGrainIntensity( FilmGrain target, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> FilmGrainIntensity( target, new TweenSettings<float>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.FilmGrainIntensity(FilmGrain, TweenSettings{float})"/>
+	public static Tween FilmGrainIntensity( FilmGrain target, float startValue, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> FilmGrainIntensity( target, new TweenSettings<float>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.FilmGrainIntensity(FilmGrain, TweenSettings{float})"/>
+	public static Tween FilmGrainIntensity( FilmGrain target, float endValue, TweenSettings settings ) => FilmGrainIntensity( target, new TweenSettings<float>( endValue, settings ) );
+
+	/// <summary>Animates the intensity of the FilmGrain post-process effect.</summary>
+	public static Tween FilmGrainIntensity( FilmGrain target, TweenSettings<float> settings ) => Animate( target, TweenType.FilmGrainIntensity, settings );
+
+	/// <inheritdoc cref="Tween.DepthOfFieldFocalDistance(DepthOfField, TweenSettings{float})"/>
+	public static Tween DepthOfFieldFocalDistance( DepthOfField target, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> DepthOfFieldFocalDistance( target, new TweenSettings<float>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.DepthOfFieldFocalDistance(DepthOfField, TweenSettings{float})"/>
+	public static Tween DepthOfFieldFocalDistance( DepthOfField target, float startValue, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> DepthOfFieldFocalDistance( target, new TweenSettings<float>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.DepthOfFieldFocalDistance(DepthOfField, TweenSettings{float})"/>
+	public static Tween DepthOfFieldFocalDistance( DepthOfField target, float endValue, TweenSettings settings ) => DepthOfFieldFocalDistance( target, new TweenSettings<float>( endValue, settings ) );
+
+	/// <summary>Animates the focal distance of the DepthOfField post-process effect.</summary>
+	public static Tween DepthOfFieldFocalDistance( DepthOfField target, TweenSettings<float> settings ) => Animate( target, TweenType.DepthOfFieldFocalDistance, settings );
+
+	/// <inheritdoc cref="Tween.DepthOfFieldBlurSize(DepthOfField, TweenSettings{float})"/>
+	public static Tween DepthOfFieldBlurSize( DepthOfField target, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> DepthOfFieldBlurSize( target, new TweenSettings<float>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.DepthOfFieldBlurSize(DepthOfField, TweenSettings{float})"/>
+	public static Tween DepthOfFieldBlurSize( DepthOfField target, float startValue, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> DepthOfFieldBlurSize( target, new TweenSettings<float>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.DepthOfFieldBlurSize(DepthOfField, TweenSettings{float})"/>
+	public static Tween DepthOfFieldBlurSize( DepthOfField target, float endValue, TweenSettings settings ) => DepthOfFieldBlurSize( target, new TweenSettings<float>( endValue, settings ) );
+
+	/// <summary>Animates the blur size of the DepthOfField post-process effect.</summary>
+	public static Tween DepthOfFieldBlurSize( DepthOfField target, TweenSettings<float> settings ) => Animate( target, TweenType.DepthOfFieldBlurSize, settings );
+
+	/// <inheritdoc cref="Tween.MotionBlurScale(MotionBlur, TweenSettings{float})"/>
+	public static Tween MotionBlurScale( MotionBlur target, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> MotionBlurScale( target, new TweenSettings<float>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.MotionBlurScale(MotionBlur, TweenSettings{float})"/>
+	public static Tween MotionBlurScale( MotionBlur target, float startValue, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> MotionBlurScale( target, new TweenSettings<float>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.MotionBlurScale(MotionBlur, TweenSettings{float})"/>
+	public static Tween MotionBlurScale( MotionBlur target, float endValue, TweenSettings settings ) => MotionBlurScale( target, new TweenSettings<float>( endValue, settings ) );
+
+	/// <summary>Animates the strength of the MotionBlur post-process effect, from 0 to 1.</summary>
+	public static Tween MotionBlurScale( MotionBlur target, TweenSettings<float> settings ) => Animate( target, TweenType.MotionBlurScale, settings );
+
+	/// <inheritdoc cref="Tween.SharpenScale(Sharpen, TweenSettings{float})"/>
+	public static Tween SharpenScale( Sharpen target, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> SharpenScale( target, new TweenSettings<float>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.SharpenScale(Sharpen, TweenSettings{float})"/>
+	public static Tween SharpenScale( Sharpen target, float startValue, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> SharpenScale( target, new TweenSettings<float>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.SharpenScale(Sharpen, TweenSettings{float})"/>
+	public static Tween SharpenScale( Sharpen target, float endValue, TweenSettings settings ) => SharpenScale( target, new TweenSettings<float>( endValue, settings ) );
+
+	/// <summary>Animates the strength of the Sharpen post-process effect.</summary>
+	public static Tween SharpenScale( Sharpen target, TweenSettings<float> settings ) => Animate( target, TweenType.SharpenScale, settings );
+
+	/// <inheritdoc cref="Tween.PostProcessVolumeBlendWeight(PostProcessVolume, TweenSettings{float})"/>
+	public static Tween PostProcessVolumeBlendWeight( PostProcessVolume target, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> PostProcessVolumeBlendWeight( target, new TweenSettings<float>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.PostProcessVolumeBlendWeight(PostProcessVolume, TweenSettings{float})"/>
+	public static Tween PostProcessVolumeBlendWeight( PostProcessVolume target, float startValue, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> PostProcessVolumeBlendWeight( target, new TweenSettings<float>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.PostProcessVolumeBlendWeight(PostProcessVolume, TweenSettings{float})"/>
+	public static Tween PostProcessVolumeBlendWeight( PostProcessVolume target, float endValue, TweenSettings settings ) => PostProcessVolumeBlendWeight( target, new TweenSettings<float>( endValue, settings ) );
+
+	/// <summary>Animates how much a PostProcessVolume is applied, from 0 to 1.</summary>
+	public static Tween PostProcessVolumeBlendWeight( PostProcessVolume target, TweenSettings<float> settings ) => Animate( target, TweenType.PostProcessVolumeBlendWeight, settings );
+
+	/// <inheritdoc cref="Tween.Color(Fog, TweenSettings{Color})"/>
+	public static Tween Color( Fog target, Color endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> Color( target, new TweenSettings<Color>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.Color(Fog, TweenSettings{Color})"/>
+	public static Tween Color( Fog target, Color startValue, Color endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> Color( target, new TweenSettings<Color>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.Color(Fog, TweenSettings{Color})"/>
+	public static Tween Color( Fog target, Color endValue, TweenSettings settings ) => Color( target, new TweenSettings<Color>( endValue, settings ) );
+
+	/// <summary>Animates the color of the Fog post-process effect. Used when its color source is a solid color.</summary>
+	public static Tween Color( Fog target, TweenSettings<Color> settings ) => Animate( target, TweenType.FogColor, settings );
+
+	/// <inheritdoc cref="Tween.FogStartDistance(Fog, TweenSettings{float})"/>
+	public static Tween FogStartDistance( Fog target, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> FogStartDistance( target, new TweenSettings<float>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.FogStartDistance(Fog, TweenSettings{float})"/>
+	public static Tween FogStartDistance( Fog target, float startValue, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> FogStartDistance( target, new TweenSettings<float>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.FogStartDistance(Fog, TweenSettings{float})"/>
+	public static Tween FogStartDistance( Fog target, float endValue, TweenSettings settings ) => FogStartDistance( target, new TweenSettings<float>( endValue, settings ) );
+
+	/// <summary>Animates the distance where the Fog post-process effect starts.</summary>
+	public static Tween FogStartDistance( Fog target, TweenSettings<float> settings ) => Animate( target, TweenType.FogStartDistance, settings );
+
+	/// <inheritdoc cref="Tween.FogDistanceRange(Fog, TweenSettings{Vector2})"/>
+	public static Tween FogDistanceRange( Fog target, Vector2 endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> FogDistanceRange( target, new TweenSettings<Vector2>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.FogDistanceRange(Fog, TweenSettings{Vector2})"/>
+	public static Tween FogDistanceRange( Fog target, Vector2 startValue, Vector2 endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> FogDistanceRange( target, new TweenSettings<Vector2>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.FogDistanceRange(Fog, TweenSettings{Vector2})"/>
+	public static Tween FogDistanceRange( Fog target, Vector2 endValue, TweenSettings settings ) => FogDistanceRange( target, new TweenSettings<Vector2>( endValue, settings ) );
+
+	/// <summary>Animates the start and end distance of the Fog post-process effect in linear mode.</summary>
+	public static Tween FogDistanceRange( Fog target, TweenSettings<Vector2> settings ) => Animate( target, TweenType.FogDistanceRange, settings );
+
+	/// <inheritdoc cref="Tween.FogAttenuationDistance(Fog, TweenSettings{float})"/>
+	public static Tween FogAttenuationDistance( Fog target, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> FogAttenuationDistance( target, new TweenSettings<float>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.FogAttenuationDistance(Fog, TweenSettings{float})"/>
+	public static Tween FogAttenuationDistance( Fog target, float startValue, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> FogAttenuationDistance( target, new TweenSettings<float>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.FogAttenuationDistance(Fog, TweenSettings{float})"/>
+	public static Tween FogAttenuationDistance( Fog target, float endValue, TweenSettings settings ) => FogAttenuationDistance( target, new TweenSettings<float>( endValue, settings ) );
+
+	/// <summary>Animates the distance where the Fog post-process effect reaches its maximum opacity in exponential mode.</summary>
+	public static Tween FogAttenuationDistance( Fog target, TweenSettings<float> settings ) => Animate( target, TweenType.FogAttenuationDistance, settings );
+
+	/// <inheritdoc cref="Tween.FogMaximumOpacity(Fog, TweenSettings{float})"/>
+	public static Tween FogMaximumOpacity( Fog target, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> FogMaximumOpacity( target, new TweenSettings<float>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.FogMaximumOpacity(Fog, TweenSettings{float})"/>
+	public static Tween FogMaximumOpacity( Fog target, float startValue, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> FogMaximumOpacity( target, new TweenSettings<float>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.FogMaximumOpacity(Fog, TweenSettings{float})"/>
+	public static Tween FogMaximumOpacity( Fog target, float endValue, TweenSettings settings ) => FogMaximumOpacity( target, new TweenSettings<float>( endValue, settings ) );
+
+	/// <summary>Animates the maximum opacity of the Fog post-process effect, from 0 to 1.</summary>
+	public static Tween FogMaximumOpacity( Fog target, TweenSettings<float> settings ) => Animate( target, TweenType.FogMaximumOpacity, settings );
+
+	/// <inheritdoc cref="Tween.VolumetricFogStrength(VolumetricFogVolume, TweenSettings{float})"/>
+	public static Tween VolumetricFogStrength( VolumetricFogVolume target, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> VolumetricFogStrength( target, new TweenSettings<float>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.VolumetricFogStrength(VolumetricFogVolume, TweenSettings{float})"/>
+	public static Tween VolumetricFogStrength( VolumetricFogVolume target, float startValue, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> VolumetricFogStrength( target, new TweenSettings<float>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.VolumetricFogStrength(VolumetricFogVolume, TweenSettings{float})"/>
+	public static Tween VolumetricFogStrength( VolumetricFogVolume target, float endValue, TweenSettings settings ) => VolumetricFogStrength( target, new TweenSettings<float>( endValue, settings ) );
+
+	/// <summary>Animates the strength of a VolumetricFogVolume, from 0 to 1.</summary>
+	public static Tween VolumetricFogStrength( VolumetricFogVolume target, TweenSettings<float> settings ) => Animate( target, TweenType.VolumetricFogStrength, settings );
+
+	/// <inheritdoc cref="Tween.Color(VolumetricFogVolume, TweenSettings{Color})"/>
+	public static Tween Color( VolumetricFogVolume target, Color endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> Color( target, new TweenSettings<Color>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.Color(VolumetricFogVolume, TweenSettings{Color})"/>
+	public static Tween Color( VolumetricFogVolume target, Color startValue, Color endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> Color( target, new TweenSettings<Color>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.Color(VolumetricFogVolume, TweenSettings{Color})"/>
+	public static Tween Color( VolumetricFogVolume target, Color endValue, TweenSettings settings ) => Color( target, new TweenSettings<Color>( endValue, settings ) );
+
+	/// <summary>Animates the color of a VolumetricFogVolume.</summary>
+	public static Tween Color( VolumetricFogVolume target, TweenSettings<Color> settings ) => Animate( target, TweenType.VolumetricFogColor, settings );
+
+	/// <inheritdoc cref="Tween.RigidbodyPosition(Rigidbody, TweenSettings{Vector3})"/>
+	public static Tween RigidbodyPosition( Rigidbody target, Vector3 endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> RigidbodyPosition( target, new TweenSettings<Vector3>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.RigidbodyPosition(Rigidbody, TweenSettings{Vector3})"/>
+	public static Tween RigidbodyPosition( Rigidbody target, Vector3 startValue, Vector3 endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> RigidbodyPosition( target, new TweenSettings<Vector3>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.RigidbodyPosition(Rigidbody, TweenSettings{Vector3})"/>
+	public static Tween RigidbodyPosition( Rigidbody target, Vector3 endValue, TweenSettings settings ) => RigidbodyPosition( target, new TweenSettings<Vector3>( endValue, settings ) );
+
+	/// <summary>Moves a Rigidbody to a world position by setting its velocity every fixed update, so it pushes other bodies instead of passing through them. Always uses UpdateType.FixedUpdate. When the tween completes, the body is placed exactly at the end value and stopped.</summary>
+	public static Tween RigidbodyPosition( Rigidbody target, TweenSettings<Vector3> settings ) => Animate( target, TweenType.RigidbodyPosition, settings );
+
+	/// <inheritdoc cref="Tween.RigidbodyRotation(Rigidbody, TweenSettings{Rotation})"/>
+	public static Tween RigidbodyRotation( Rigidbody target, Rotation endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> RigidbodyRotation( target, new TweenSettings<Rotation>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.RigidbodyRotation(Rigidbody, TweenSettings{Rotation})"/>
+	public static Tween RigidbodyRotation( Rigidbody target, Rotation startValue, Rotation endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> RigidbodyRotation( target, new TweenSettings<Rotation>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.RigidbodyRotation(Rigidbody, TweenSettings{Rotation})"/>
+	public static Tween RigidbodyRotation( Rigidbody target, Rotation endValue, TweenSettings settings ) => RigidbodyRotation( target, new TweenSettings<Rotation>( endValue, settings ) );
+
+	/// <summary>Rotates a Rigidbody to a world rotation by setting its angular velocity every fixed update. Always uses UpdateType.FixedUpdate. When the tween completes, the body is placed exactly at the end value and stopped.</summary>
+	public static Tween RigidbodyRotation( Rigidbody target, TweenSettings<Rotation> settings ) => Animate( target, TweenType.RigidbodyRotation, settings );
+
+	/// <inheritdoc cref="Tween.RigidbodyRotation(Rigidbody, TweenSettings{Rotation})"/>
+	public static Tween RigidbodyRotation( Rigidbody target, TweenSettings<Angles> settings ) => RigidbodyRotation( target, ToRotation( settings ) );
+
+	/// <inheritdoc cref="Tween.RendererAttribute(Renderer, string, TweenSettings{float})"/>
+	public static Tween RendererAttribute( Renderer target, string attribute, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> RendererAttribute( target, attribute, new TweenSettings<float>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.RendererAttribute(Renderer, string, TweenSettings{float})"/>
+	public static Tween RendererAttribute( Renderer target, string attribute, float startValue, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> RendererAttribute( target, attribute, new TweenSettings<float>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.RendererAttribute(Renderer, string, TweenSettings{float})"/>
+	public static Tween RendererAttribute( Renderer target, string attribute, float endValue, TweenSettings settings ) => RendererAttribute( target, attribute, new TweenSettings<float>( endValue, settings ) );
+
+	/// <summary>Animates a shader attribute of a renderer by name (Renderer.Attributes). Attributes that weren't set read as zero, so pass the start value if the shader's default isn't zero.</summary>
+	public static Tween RendererAttribute( Renderer target, string attribute, TweenSettings<float> settings ) => Animate( target, TweenType.RendererAttributeFloat, settings, attribute );
+
+	/// <inheritdoc cref="Tween.RendererAttribute(Renderer, string, TweenSettings{Vector3})"/>
+	public static Tween RendererAttribute( Renderer target, string attribute, Vector3 endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> RendererAttribute( target, attribute, new TweenSettings<Vector3>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.RendererAttribute(Renderer, string, TweenSettings{Vector3})"/>
+	public static Tween RendererAttribute( Renderer target, string attribute, Vector3 startValue, Vector3 endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> RendererAttribute( target, attribute, new TweenSettings<Vector3>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.RendererAttribute(Renderer, string, TweenSettings{Vector3})"/>
+	public static Tween RendererAttribute( Renderer target, string attribute, Vector3 endValue, TweenSettings settings ) => RendererAttribute( target, attribute, new TweenSettings<Vector3>( endValue, settings ) );
+
+	/// <summary>Animates a shader attribute of a renderer by name (Renderer.Attributes). Attributes that weren't set read as zero, so pass the start value if the shader's default isn't zero.</summary>
+	public static Tween RendererAttribute( Renderer target, string attribute, TweenSettings<Vector3> settings ) => Animate( target, TweenType.RendererAttributeVector3, settings, attribute );
+
+	/// <inheritdoc cref="Tween.RendererAttribute(Renderer, string, TweenSettings{Vector4})"/>
+	public static Tween RendererAttribute( Renderer target, string attribute, Vector4 endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> RendererAttribute( target, attribute, new TweenSettings<Vector4>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.RendererAttribute(Renderer, string, TweenSettings{Vector4})"/>
+	public static Tween RendererAttribute( Renderer target, string attribute, Vector4 startValue, Vector4 endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> RendererAttribute( target, attribute, new TweenSettings<Vector4>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.RendererAttribute(Renderer, string, TweenSettings{Vector4})"/>
+	public static Tween RendererAttribute( Renderer target, string attribute, Vector4 endValue, TweenSettings settings ) => RendererAttribute( target, attribute, new TweenSettings<Vector4>( endValue, settings ) );
+
+	/// <summary>Animates a shader attribute of a renderer by name (Renderer.Attributes). Attributes that weren't set read as zero, so pass the start value if the shader's default isn't zero.</summary>
+	public static Tween RendererAttribute( Renderer target, string attribute, TweenSettings<Vector4> settings ) => Animate( target, TweenType.RendererAttributeVector4, settings, attribute );
+
+	/// <inheritdoc cref="Tween.RendererAttribute(Renderer, string, TweenSettings{Color})"/>
+	public static Tween RendererAttribute( Renderer target, string attribute, Color endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> RendererAttribute( target, attribute, new TweenSettings<Color>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.RendererAttribute(Renderer, string, TweenSettings{Color})"/>
+	public static Tween RendererAttribute( Renderer target, string attribute, Color startValue, Color endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> RendererAttribute( target, attribute, new TweenSettings<Color>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.RendererAttribute(Renderer, string, TweenSettings{Color})"/>
+	public static Tween RendererAttribute( Renderer target, string attribute, Color endValue, TweenSettings settings ) => RendererAttribute( target, attribute, new TweenSettings<Color>( endValue, settings ) );
+
+	/// <summary>Animates a shader attribute of a renderer by name (Renderer.Attributes), stored as a float4. Attributes that weren't set read as zero, so pass the start value if the shader's default isn't zero.</summary>
+	public static Tween RendererAttribute( Renderer target, string attribute, TweenSettings<Color> settings ) => Animate( target, TweenType.RendererAttributeColor, settings, attribute );
+
+	/// <inheritdoc cref="Tween.AnimParameter(SkinnedModelRenderer, string, TweenSettings{float})"/>
+	public static Tween AnimParameter( SkinnedModelRenderer target, string parameter, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> AnimParameter( target, parameter, new TweenSettings<float>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.AnimParameter(SkinnedModelRenderer, string, TweenSettings{float})"/>
+	public static Tween AnimParameter( SkinnedModelRenderer target, string parameter, float startValue, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> AnimParameter( target, parameter, new TweenSettings<float>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.AnimParameter(SkinnedModelRenderer, string, TweenSettings{float})"/>
+	public static Tween AnimParameter( SkinnedModelRenderer target, string parameter, float endValue, TweenSettings settings ) => AnimParameter( target, parameter, new TweenSettings<float>( endValue, settings ) );
+
+	/// <summary>Animates a float parameter of the renderer's animation graph.</summary>
+	public static Tween AnimParameter( SkinnedModelRenderer target, string parameter, TweenSettings<float> settings ) => Animate( target, TweenType.AnimParameterFloat, settings, parameter );
+
+	/// <inheritdoc cref="Tween.AnimParameter(SkinnedModelRenderer, string, TweenSettings{Vector3})"/>
+	public static Tween AnimParameter( SkinnedModelRenderer target, string parameter, Vector3 endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> AnimParameter( target, parameter, new TweenSettings<Vector3>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.AnimParameter(SkinnedModelRenderer, string, TweenSettings{Vector3})"/>
+	public static Tween AnimParameter( SkinnedModelRenderer target, string parameter, Vector3 startValue, Vector3 endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> AnimParameter( target, parameter, new TweenSettings<Vector3>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.AnimParameter(SkinnedModelRenderer, string, TweenSettings{Vector3})"/>
+	public static Tween AnimParameter( SkinnedModelRenderer target, string parameter, Vector3 endValue, TweenSettings settings ) => AnimParameter( target, parameter, new TweenSettings<Vector3>( endValue, settings ) );
+
+	/// <summary>Animates a vector parameter of the renderer's animation graph.</summary>
+	public static Tween AnimParameter( SkinnedModelRenderer target, string parameter, TweenSettings<Vector3> settings ) => Animate( target, TweenType.AnimParameterVector3, settings, parameter );
+
+	/// <inheritdoc cref="Tween.AnimParameter(SkinnedModelRenderer, string, TweenSettings{Rotation})"/>
+	public static Tween AnimParameter( SkinnedModelRenderer target, string parameter, Rotation endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> AnimParameter( target, parameter, new TweenSettings<Rotation>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.AnimParameter(SkinnedModelRenderer, string, TweenSettings{Rotation})"/>
+	public static Tween AnimParameter( SkinnedModelRenderer target, string parameter, Rotation startValue, Rotation endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> AnimParameter( target, parameter, new TweenSettings<Rotation>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.AnimParameter(SkinnedModelRenderer, string, TweenSettings{Rotation})"/>
+	public static Tween AnimParameter( SkinnedModelRenderer target, string parameter, Rotation endValue, TweenSettings settings ) => AnimParameter( target, parameter, new TweenSettings<Rotation>( endValue, settings ) );
+
+	/// <summary>Animates a rotation parameter of the renderer's animation graph using spherical interpolation.</summary>
+	public static Tween AnimParameter( SkinnedModelRenderer target, string parameter, TweenSettings<Rotation> settings ) => Animate( target, TweenType.AnimParameterRotation, settings, parameter );
+
+	/// <inheritdoc cref="Tween.Morph(SkinnedModelRenderer, string, TweenSettings{float})"/>
+	public static Tween Morph( SkinnedModelRenderer target, string morph, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> Morph( target, morph, new TweenSettings<float>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.Morph(SkinnedModelRenderer, string, TweenSettings{float})"/>
+	public static Tween Morph( SkinnedModelRenderer target, string morph, float startValue, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> Morph( target, morph, new TweenSettings<float>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.Morph(SkinnedModelRenderer, string, TweenSettings{float})"/>
+	public static Tween Morph( SkinnedModelRenderer target, string morph, float endValue, TweenSettings settings ) => Morph( target, morph, new TweenSettings<float>( endValue, settings ) );
+
+	/// <summary>Animates the weight of a morph (blend shape), usually from 0 to 1. The morph stays overridden after the tween ends; call Morphs.Clear() to give it back to the animation.</summary>
+	public static Tween Morph( SkinnedModelRenderer target, string morph, TweenSettings<float> settings ) => Animate( target, TweenType.Morph, settings, morph );
+
+	/// <inheritdoc cref="Tween.Property(object, string, TweenSettings{float})"/>
+	public static Tween Property( object target, string property, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> Property( target, property, new TweenSettings<float>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.Property(object, string, TweenSettings{float})"/>
+	public static Tween Property( object target, string property, float startValue, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> Property( target, property, new TweenSettings<float>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.Property(object, string, TweenSettings{float})"/>
+	public static Tween Property( object target, string property, float endValue, TweenSettings settings ) => Property( target, property, new TweenSettings<float>( endValue, settings ) );
+
+	/// <summary>Animates any property by name through the TypeLibrary, e.g. a [Property] of a component. Boxes the value on every update, so it allocates; prefer a typed method or Tween.Custom in hot paths.</summary>
+	public static Tween Property( object target, string property, TweenSettings<float> settings ) => Animate( target, TweenType.PropertyFloat, settings, property );
+
+	/// <inheritdoc cref="Tween.Property(object, string, TweenSettings{Vector2})"/>
+	public static Tween Property( object target, string property, Vector2 endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> Property( target, property, new TweenSettings<Vector2>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.Property(object, string, TweenSettings{Vector2})"/>
+	public static Tween Property( object target, string property, Vector2 startValue, Vector2 endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> Property( target, property, new TweenSettings<Vector2>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.Property(object, string, TweenSettings{Vector2})"/>
+	public static Tween Property( object target, string property, Vector2 endValue, TweenSettings settings ) => Property( target, property, new TweenSettings<Vector2>( endValue, settings ) );
+
+	/// <summary>Animates any property by name through the TypeLibrary, e.g. a [Property] of a component. Boxes the value on every update, so it allocates; prefer a typed method or Tween.Custom in hot paths.</summary>
+	public static Tween Property( object target, string property, TweenSettings<Vector2> settings ) => Animate( target, TweenType.PropertyVector2, settings, property );
+
+	/// <inheritdoc cref="Tween.Property(object, string, TweenSettings{Vector3})"/>
+	public static Tween Property( object target, string property, Vector3 endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> Property( target, property, new TweenSettings<Vector3>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.Property(object, string, TweenSettings{Vector3})"/>
+	public static Tween Property( object target, string property, Vector3 startValue, Vector3 endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> Property( target, property, new TweenSettings<Vector3>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.Property(object, string, TweenSettings{Vector3})"/>
+	public static Tween Property( object target, string property, Vector3 endValue, TweenSettings settings ) => Property( target, property, new TweenSettings<Vector3>( endValue, settings ) );
+
+	/// <summary>Animates any property by name through the TypeLibrary, e.g. a [Property] of a component. Boxes the value on every update, so it allocates; prefer a typed method or Tween.Custom in hot paths.</summary>
+	public static Tween Property( object target, string property, TweenSettings<Vector3> settings ) => Animate( target, TweenType.PropertyVector3, settings, property );
+
+	/// <inheritdoc cref="Tween.Property(object, string, TweenSettings{Vector4})"/>
+	public static Tween Property( object target, string property, Vector4 endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> Property( target, property, new TweenSettings<Vector4>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.Property(object, string, TweenSettings{Vector4})"/>
+	public static Tween Property( object target, string property, Vector4 startValue, Vector4 endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> Property( target, property, new TweenSettings<Vector4>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.Property(object, string, TweenSettings{Vector4})"/>
+	public static Tween Property( object target, string property, Vector4 endValue, TweenSettings settings ) => Property( target, property, new TweenSettings<Vector4>( endValue, settings ) );
+
+	/// <summary>Animates any property by name through the TypeLibrary, e.g. a [Property] of a component. Boxes the value on every update, so it allocates; prefer a typed method or Tween.Custom in hot paths.</summary>
+	public static Tween Property( object target, string property, TweenSettings<Vector4> settings ) => Animate( target, TweenType.PropertyVector4, settings, property );
+
+	/// <inheritdoc cref="Tween.Property(object, string, TweenSettings{Color})"/>
+	public static Tween Property( object target, string property, Color endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> Property( target, property, new TweenSettings<Color>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.Property(object, string, TweenSettings{Color})"/>
+	public static Tween Property( object target, string property, Color startValue, Color endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> Property( target, property, new TweenSettings<Color>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.Property(object, string, TweenSettings{Color})"/>
+	public static Tween Property( object target, string property, Color endValue, TweenSettings settings ) => Property( target, property, new TweenSettings<Color>( endValue, settings ) );
+
+	/// <summary>Animates any property by name through the TypeLibrary, e.g. a [Property] of a component. Boxes the value on every update, so it allocates; prefer a typed method or Tween.Custom in hot paths.</summary>
+	public static Tween Property( object target, string property, TweenSettings<Color> settings ) => Animate( target, TweenType.PropertyColor, settings, property );
+
+	/// <inheritdoc cref="Tween.Property(object, string, TweenSettings{Rotation})"/>
+	public static Tween Property( object target, string property, Rotation endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> Property( target, property, new TweenSettings<Rotation>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.Property(object, string, TweenSettings{Rotation})"/>
+	public static Tween Property( object target, string property, Rotation startValue, Rotation endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> Property( target, property, new TweenSettings<Rotation>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.Property(object, string, TweenSettings{Rotation})"/>
+	public static Tween Property( object target, string property, Rotation endValue, TweenSettings settings ) => Property( target, property, new TweenSettings<Rotation>( endValue, settings ) );
+
+	/// <summary>Animates any property by name through the TypeLibrary, e.g. a [Property] of a component, using spherical interpolation. Boxes the value on every update, so it allocates; prefer a typed method or Tween.Custom in hot paths.</summary>
+	public static Tween Property( object target, string property, TweenSettings<Rotation> settings ) => Animate( target, TweenType.PropertyRotation, settings, property );
+
+	/// <inheritdoc cref="Tween.Property(object, string, TweenSettings{Angles})"/>
+	public static Tween Property( object target, string property, Angles endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> Property( target, property, new TweenSettings<Angles>( endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.Property(object, string, TweenSettings{Angles})"/>
+	public static Tween Property( object target, string property, Angles startValue, Angles endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
+		=> Property( target, property, new TweenSettings<Angles>( startValue, endValue, new TweenSettings( duration, ease, cycles, cycleMode, startDelay, endDelay, useUnscaledTime ) ) );
+
+	/// <inheritdoc cref="Tween.Property(object, string, TweenSettings{Angles})"/>
+	public static Tween Property( object target, string property, Angles endValue, TweenSettings settings ) => Property( target, property, new TweenSettings<Angles>( endValue, settings ) );
+
+	/// <summary>Animates any property by name through the TypeLibrary, e.g. a [Property] of a component. Boxes the value on every update, so it allocates; prefer a typed method or Tween.Custom in hot paths.</summary>
+	public static Tween Property( object target, string property, TweenSettings<Angles> settings ) => Animate( target, TweenType.PropertyAngles, settings, property );
 
 	/// <inheritdoc cref="Tween.PanelOpacity(Panel, TweenSettings{float})"/>
 	public static Tween PanelOpacity( Panel target, float endValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )

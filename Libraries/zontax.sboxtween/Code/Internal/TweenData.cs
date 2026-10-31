@@ -257,6 +257,7 @@ internal sealed partial class TweenData
 		ReleasePanelStyle = false;
 		PanelTransitionChecked = false;
 		PanelTransitionConflict = false;
+		ResetParameter();
 
 		Id = -1;
 	}
@@ -1308,6 +1309,8 @@ internal sealed partial class TweenData
 				break;
 			default:
 				sb.Append( TweenType );
+				if ( IsNamed( TweenType ) )
+					sb.Append( " '" ).Append( ParameterName ).Append( '\'' );
 				break;
 		}
 

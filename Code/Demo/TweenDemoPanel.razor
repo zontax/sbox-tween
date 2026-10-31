@@ -10,27 +10,109 @@
 		<div class="title">SboxTween</div>
 		<div class="subtitle">PrimeTween for s&box</div>
 
-		<div class="section">Sequence</div>
-		<div class="row">
-			<div class="button progress-button" onclick=@( ( PanelEvent e ) => Press( e, () => Demo?.PlaySequence() ) )>
-				<div class="progress-fill" style="width: @( (Demo?.SequenceProgress ?? 0) * 100 )%"></div>
-				<div class="button-text">Play Sequence</div>
+		<div class="section">Stands</div>
+		<div class="row nav">
+			<div class="button nav-button" onclick=@( ( PanelEvent e ) => Press( e, () => Demo?.FocusPrevious() ) )>‹</div>
+			<div class="nav-title">@( Demo?.FocusedStand?.Title ?? "Overview" )</div>
+			<div class="button nav-button" onclick=@( ( PanelEvent e ) => Press( e, () => Demo?.FocusNext() ) )>›</div>
+		</div>
+		<div class="dots">
+			<div class="dot overview @( Focus == -1 ? "active" : "" )" onclick=@( ( PanelEvent e ) => Press( e, () => Demo?.FocusStand( -1 ) ) )></div>
+			@for ( int i = 0; i < TweenDemo.Stands.Length; i++ )
+			{
+				int index = i;
+				<div class="dot @( Focus == index ? "active" : "" )" onclick=@( ( PanelEvent e ) => Press( e, () => Demo?.FocusStand( index ) ) )></div>
+			}
+		</div>
+		@* The description is typed from code with the Label typewriter, razor doesn't touch its text *@
+		<label class="description" @ref="Description"></label>
+
+		<div class="section">Actions</div>
+		@if ( Focus == 0 )
+		{
+			<div class="row">
+				<div class="button @( Demo?.IsRaceSlow == true ? "active" : "" )" onclick=@( ( PanelEvent e ) => Press( e, () => Demo?.ToggleRaceClock() ) )>Race ×0.25</div>
 			</div>
-		</div>
-
-		<div class="section">Shake & Punch</div>
-		<div class="row">
-			<div class="button" onclick=@( ( PanelEvent e ) => Press( e, () => Demo?.Punch() ) )>Punch</div>
-			<div class="button" onclick=@( ( PanelEvent e ) => Press( e, () => Demo?.ShakeObject() ) )>Shake</div>
-			<div class="button" onclick=@( ( PanelEvent e ) => Press( e, () => Demo?.ShakeCamera() ) )>Camera</div>
-		</div>
-
-		<div class="section">Wait · Additive · Clock</div>
-		<div class="row">
-			<div class="button @( Demo?.IsGateWaiting == true ? "active" : "" )" onclick=@( ( PanelEvent e ) => Press( e, () => Demo?.OpenGate() ) )>Open Gate</div>
-			<div class="button" onclick=@( ( PanelEvent e ) => Press( e, () => Demo?.AdditiveSpin() ) )>Spin +90°</div>
-			<div class="button @( Demo?.IsRaceSlow == true ? "active" : "" )" onclick=@( ( PanelEvent e ) => Press( e, () => Demo?.ToggleRaceClock() ) )>Race ×0.25</div>
-		</div>
+		}
+		else if ( Focus == 1 )
+		{
+			<div class="row">
+				<div class="button progress-button" onclick=@( ( PanelEvent e ) => Press( e, () => Demo?.PlaySequence() ) )>
+					<div class="progress-fill" style="width: @( (Demo?.SequenceProgress ?? 0) * 100 )%"></div>
+					<div class="button-text">Play Sequence</div>
+				</div>
+			</div>
+		}
+		else if ( Focus == 2 )
+		{
+			<div class="row">
+				<div class="button" onclick=@( ( PanelEvent e ) => Press( e, () => Demo?.Punch() ) )>Punch</div>
+				<div class="button" onclick=@( ( PanelEvent e ) => Press( e, () => Demo?.ShakeObject() ) )>Shake</div>
+				<div class="button" onclick=@( ( PanelEvent e ) => Press( e, () => Demo?.ShakeCamera() ) )>Camera</div>
+			</div>
+		}
+		else if ( Focus == 6 )
+		{
+			<div class="row">
+				<div class="button @( Demo?.IsGateWaiting == true ? "active" : "" )" onclick=@( ( PanelEvent e ) => Press( e, () => Demo?.OpenGate() ) )>Open Gate</div>
+				<div class="button" onclick=@( ( PanelEvent e ) => Press( e, () => Demo?.AdditiveSpin() ) )>Spin +90°</div>
+			</div>
+		}
+		else if ( Focus == 7 )
+		{
+			<div class="row">
+				<div class="button" onclick=@( ( PanelEvent e ) => Press( e, () => Demo?.Dissolve() ) )>Dissolve</div>
+				<div class="button" onclick=@( ( PanelEvent e ) => Press( e, () => Demo?.ShiftGlowColor() ) )>Glow Color</div>
+			</div>
+		}
+		else if ( Focus == 8 )
+		{
+			<div class="row">
+				<div class="button @( Demo?.IsCrouching == true ? "active" : "" )" onclick=@( ( PanelEvent e ) => Press( e, () => Demo?.ToggleCrouch() ) )>Crouch</div>
+				<div class="button @( Demo?.IsWalking == true ? "active" : "" )" onclick=@( ( PanelEvent e ) => Press( e, () => Demo?.ToggleWalk() ) )>Walk</div>
+			</div>
+			<div class="row">
+				<div class="button" onclick=@( ( PanelEvent e ) => Press( e, () => Demo?.Smile() ) )>Smile</div>
+				<div class="button" onclick=@( ( PanelEvent e ) => Press( e, () => Demo?.Talk() ) )>Talk</div>
+			</div>
+		}
+		else if ( Focus == 9 )
+		{
+			<div class="row">
+				<div class="button" onclick=@( ( PanelEvent e ) => Press( e, () => Demo?.HitEffect() ) )>Hit</div>
+				<div class="button" onclick=@( ( PanelEvent e ) => Press( e, () => Demo?.DreamEffect() ) )>Dream</div>
+				<div class="button @( Demo?.IsNoir == true ? "active" : "" )" onclick=@( ( PanelEvent e ) => Press( e, () => Demo?.ToggleNoir() ) )>Noir</div>
+			</div>
+		}
+		else if ( Focus == 10 )
+		{
+			<div class="row">
+				<div class="button" onclick=@( ( PanelEvent e ) => Press( e, () => Demo?.SkipQuote() ) )>Skip</div>
+				<div class="button @( Demo?.IsFastTyping == true ? "active" : "" )" onclick=@( ( PanelEvent e ) => Press( e, () => Demo?.ToggleTypingSpeed() ) )>Fast Typing</div>
+			</div>
+		}
+		else if ( Focus == 11 )
+		{
+			<div class="row">
+				<div class="button @( Demo?.IsNight == true ? "active" : "" )" onclick=@( ( PanelEvent e ) => Press( e, () => Demo?.ToggleDayNight() ) )>Night</div>
+				<div class="button" onclick=@( ( PanelEvent e ) => Press( e, () => Demo?.FlickerLamp() ) )>Flicker</div>
+				<div class="button @( Demo?.IsFanFast == true ? "active" : "" )" onclick=@( ( PanelEvent e ) => Press( e, () => Demo?.ToggleFanSpeed() ) )>Fan</div>
+			</div>
+		}
+		else if ( Focus == 12 )
+		{
+			<div class="row">
+				<div class="button" onclick=@( ( PanelEvent e ) => Press( e, () => Demo?.ResetCrates() ) )>Reset Crates</div>
+			</div>
+		}
+		else if ( Focus == -1 )
+		{
+			<div class="hint">Pick a stand with the arrows or the dots, the camera flies there.</div>
+		}
+		else
+		{
+			<div class="hint">This stand only plays idle animations.</div>
+		}
 
 		<div class="section">UI</div>
 		<div class="row">
@@ -105,6 +187,7 @@
 	[Property] public TweenDemo Demo { get; set; }
 
 	Panel MainPanel { get; set; }
+	Label Description { get; set; }
 	Panel Toasts { get; set; }
 	Panel Showcase { get; set; }
 	Panel CardList { get; set; }
@@ -113,6 +196,9 @@
 	bool _showcaseIntroPending;
 	bool _isShowcaseClosing;
 	string _lastEvent;
+	int _typedFocus = int.MinValue;
+
+	int Focus => Demo?.FocusIndex ?? -1;
 	float CounterValue { get; set; }
 	readonly HashSet<Panel> _expandedCards = [];
 
@@ -145,6 +231,13 @@
 		{
 			_lastEvent = lastEvent;
 			ShowToast( lastEvent );
+		}
+
+		// The description of the focused stand is typed in
+		if ( Focus != _typedFocus && Description.IsValid() )
+		{
+			_typedFocus = Focus;
+			Description.TweenTypewriterAtSpeed( Demo?.FocusedStand?.Description ?? "All stands. Every animation here is a tween or a sequence of tweens.", 90 );
 		}
 	}
 
@@ -267,6 +360,6 @@
 		Demo?.Callbacks,
 		Scene.TimeScale,
 		HashCode.Combine( Demo?.IsSlowMotion, Demo?.IsPaused, Demo?.IsGateWaiting, Demo?.IsRaceSlow ),
-		IsShowcaseOpen,
-		CounterValue );
+		HashCode.Combine( Focus, Demo?.IsCrouching, Demo?.IsWalking, Demo?.IsNoir, Demo?.IsNight, Demo?.IsFastTyping, Demo?.IsFanFast ),
+		HashCode.Combine( IsShowcaseOpen, CounterValue ) );
 }

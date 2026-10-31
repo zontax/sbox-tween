@@ -197,16 +197,16 @@ public readonly partial struct Tween
 		return AnimateCore( awaited, TweenType.TweenAwaiter, default, default, settings, false, awaited.Manager, awaited.Id );
 	}
 
-	internal static Tween Animate( object target, TweenType tweenType, TweenSettings<float> s ) => AnimateCore( target, tweenType, ValueContainer.From( s.StartValue ), ValueContainer.From( s.EndValue ), s.Settings, s.StartFromCurrent );
-	internal static Tween Animate( object target, TweenType tweenType, TweenSettings<Vector2> s ) => AnimateCore( target, tweenType, ValueContainer.From( s.StartValue ), ValueContainer.From( s.EndValue ), s.Settings, s.StartFromCurrent );
-	internal static Tween Animate( object target, TweenType tweenType, TweenSettings<Vector3> s ) => AnimateCore( target, tweenType, ValueContainer.From( s.StartValue ), ValueContainer.From( s.EndValue ), s.Settings, s.StartFromCurrent );
-	internal static Tween Animate( object target, TweenType tweenType, TweenSettings<Vector4> s ) => AnimateCore( target, tweenType, ValueContainer.From( s.StartValue ), ValueContainer.From( s.EndValue ), s.Settings, s.StartFromCurrent );
-	internal static Tween Animate( object target, TweenType tweenType, TweenSettings<Color> s ) => AnimateCore( target, tweenType, ValueContainer.From( s.StartValue ), ValueContainer.From( s.EndValue ), s.Settings, s.StartFromCurrent );
-	internal static Tween Animate( object target, TweenType tweenType, TweenSettings<Rotation> s ) => AnimateCore( target, tweenType, ValueContainer.From( s.StartValue ), ValueContainer.From( s.EndValue ), s.Settings, s.StartFromCurrent );
-	internal static Tween Animate( object target, TweenType tweenType, TweenSettings<Angles> s ) => AnimateCore( target, tweenType, ValueContainer.From( s.StartValue ), ValueContainer.From( s.EndValue ), s.Settings, s.StartFromCurrent );
+	internal static Tween Animate( object target, TweenType tweenType, TweenSettings<float> s, string parameterName = null ) => AnimateCore( target, tweenType, ValueContainer.From( s.StartValue ), ValueContainer.From( s.EndValue ), s.Settings, s.StartFromCurrent, parameterName: parameterName );
+	internal static Tween Animate( object target, TweenType tweenType, TweenSettings<Vector2> s, string parameterName = null ) => AnimateCore( target, tweenType, ValueContainer.From( s.StartValue ), ValueContainer.From( s.EndValue ), s.Settings, s.StartFromCurrent, parameterName: parameterName );
+	internal static Tween Animate( object target, TweenType tweenType, TweenSettings<Vector3> s, string parameterName = null ) => AnimateCore( target, tweenType, ValueContainer.From( s.StartValue ), ValueContainer.From( s.EndValue ), s.Settings, s.StartFromCurrent, parameterName: parameterName );
+	internal static Tween Animate( object target, TweenType tweenType, TweenSettings<Vector4> s, string parameterName = null ) => AnimateCore( target, tweenType, ValueContainer.From( s.StartValue ), ValueContainer.From( s.EndValue ), s.Settings, s.StartFromCurrent, parameterName: parameterName );
+	internal static Tween Animate( object target, TweenType tweenType, TweenSettings<Color> s, string parameterName = null ) => AnimateCore( target, tweenType, ValueContainer.From( s.StartValue ), ValueContainer.From( s.EndValue ), s.Settings, s.StartFromCurrent, parameterName: parameterName );
+	internal static Tween Animate( object target, TweenType tweenType, TweenSettings<Rotation> s, string parameterName = null ) => AnimateCore( target, tweenType, ValueContainer.From( s.StartValue ), ValueContainer.From( s.EndValue ), s.Settings, s.StartFromCurrent, parameterName: parameterName );
+	internal static Tween Animate( object target, TweenType tweenType, TweenSettings<Angles> s, string parameterName = null ) => AnimateCore( target, tweenType, ValueContainer.From( s.StartValue ), ValueContainer.From( s.EndValue ), s.Settings, s.StartFromCurrent, parameterName: parameterName );
 
 	internal static Tween AnimateCore( object target, TweenType tweenType, ValueContainer startValue, ValueContainer endValue, TweenSettings settings, bool startFromCurrent, TweenManager manager = null, long targetTweenId = 0,
-		LengthUnit unitX = LengthUnit.Auto, LengthUnit unitY = LengthUnit.Auto )
+		LengthUnit unitX = LengthUnit.Auto, LengthUnit unitY = LengthUnit.Auto, string parameterName = null )
 	{
 		// Vector2 translate overloads are in pixels
 		if ( tweenType == TweenType.PanelTranslate && unitX == LengthUnit.Auto )
@@ -219,7 +219,15 @@ public readonly partial struct Tween
 		if ( manager is null || manager.IsDisposed )
 			return default;
 
+		if ( TweenData.IsRigidbody( tweenType ) )
+			settings.UpdateType = ValidateRigidbodyUpdateType( settings.UpdateType );
+
+		object parameterCache = null;
+		if ( TweenData.IsNamed( tweenType ) && !TweenData.ValidateParameter( target, tweenType, parameterName, out parameterCache ) )
+			return default;
+
 		var tween = manager.Fetch( settings.UpdateType );
+		tween.SetParameter( tweenType, parameterName, parameterCache );
 		tween.StartValue = startValue;
 		tween.EndValueOrDiff = endValue;
 		tween.TargetTweenId = targetTweenId;
@@ -227,6 +235,14 @@ public readonly partial struct Tween
 		tween.LengthUnitY = unitY;
 		tween.Setup( target, ref settings, startFromCurrent, tweenType );
 		return manager.Animate( tween );
+	}
+
+	static UpdateType ValidateRigidbodyUpdateType( UpdateType updateType )
+	{
+		if ( updateType != UpdateType.Default && updateType != UpdateType.FixedUpdate )
+			TweenLog.Warning( $"Rigidbody tweens always use UpdateType.FixedUpdate, the requested UpdateType.{updateType} is ignored." );
+
+		return UpdateType.FixedUpdate;
 	}
 
 	internal static Tween CustomCore( object target, TweenType tweenType, ValueContainer startValue, ValueContainer endValue, TweenSettings settings, bool startFromCurrent,

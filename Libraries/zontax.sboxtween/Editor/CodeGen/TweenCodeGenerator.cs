@@ -4,15 +4,17 @@ using System.Text;
 namespace SboxTween.Editor;
 
 /// <summary>
-/// Generates the repetitive overloads of <see cref="Tween"/> and <see cref="GameObjectTweenExtensions"/>.
-/// To add a new animatable property, add a row to <see cref="Properties"/> and a <c>TweenType</c> with its getter/setter in TweenData.Values.cs,
-/// then run Editor → Sbox Tween → Developer → Regenerate Tween API.
+/// Generates the repetitive overloads of <see cref="Tween"/> and the extension methods.
+/// To add a new animatable property, add a <c>TweenType</c> and a row to <see cref="Properties"/>. Rows with a <see cref="PropertyInfo.Member"/>
+/// get a generated getter/setter; other rows need one in TweenData.Values.cs. Then run Editor → Sbox Tween → Developer → Regenerate Tween API.
 /// </summary>
 public static class TweenCodeGenerator
 {
 	public const string TweenFileName = "Tween.Generated.cs";
 	public const string ExtensionsFileName = "GameObjectTweenExtensions.Generated.cs";
 	public const string PanelExtensionsFileName = "PanelTweenExtensions.Generated.cs";
+	public const string ComponentExtensionsFileName = "ComponentTweenExtensions.Generated.cs";
+	public const string AccessorsFileName = "TweenData.Generated.cs";
 
 	const string NewLine = "\r\n";
 	const string Common = "TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false";
@@ -26,9 +28,17 @@ public static class TweenCodeGenerator
 	/// <param name="AcceptsAngles">Rotation tweens also accept TweenSettings&lt;Angles&gt;.</param>
 	/// <param name="StartRequired">Euler angles can't be read reliably, so only overloads with a start value are generated.</param>
 	/// <param name="ExtensionName">The extension method name. Defaults to "Tween" + <paramref name="Name"/>.</param>
-	public record PropertyInfo( string Name, string Target, string Type, string TweenType, string Summary, bool Extension = false, bool AcceptsAngles = false, bool StartRequired = false, string ExtensionName = null )
+	/// <param name="Member">The property of the target to animate. Generates the getter and setter of <paramref name="TweenType"/>.</param>
+	/// <param name="NameParameter">Adds a string parameter with this name after the target, e.g. the name of a shader attribute.</param>
+	/// <param name="ExtensionTarget">The type extended by the extension method. Defaults to <paramref name="Target"/>.</param>
+	public record PropertyInfo( string Name, string Target, string Type, string TweenType, string Summary, bool Extension = false, bool AcceptsAngles = false, bool StartRequired = false, string ExtensionName = null,
+		string Member = null, string NameParameter = null, string ExtensionTarget = null )
 	{
 		public string ExtensionMethod => ExtensionName ?? $"Tween{Name}";
+
+		public string ExtendedType => ExtensionTarget ?? Target;
+
+		public bool IsComponent => ExtendedType != "GameObject" && ExtendedType != "Panel";
 
 		/// <summary>Length values are passed as Length? so Length.Percent() and friends can be used directly.</summary>
 		public string ParameterType => Type == "Length" ? "Length?" : Type;
@@ -60,22 +70,78 @@ public static class TweenCodeGenerator
 		new( "LocalScaleZ", "GameObject", "float", "LocalScaleZ", "Animates the local Z scale of a GameObject.", Extension: true ),
 		new( "WorldScale", "GameObject", "Vector3", "WorldScale", "Animates the world scale of a GameObject.", Extension: true ),
 
-		new( "Color", "Component.ITintable", "Color", "TintableColor", "Animates the tint color of a component (ModelRenderer, Light, MeshComponent, ParticleEffect, etc.)." ),
-		new( "Alpha", "Component.ITintable", "float", "TintableAlpha", "Animates the alpha of the tint color of a component (ModelRenderer, Light, MeshComponent, ParticleEffect, etc.)." ),
-		new( "Color", "SpriteRenderer", "Color", "SpriteColor", "Animates the color of a SpriteRenderer." ),
-		new( "Alpha", "SpriteRenderer", "float", "SpriteAlpha", "Animates the alpha of a SpriteRenderer." ),
-		new( "Color", "TextRenderer", "Color", "TextColor", "Animates the color of a TextRenderer." ),
-		new( "Alpha", "TextRenderer", "float", "TextAlpha", "Animates the alpha of a TextRenderer." ),
-		new( "LightRadius", "PointLight", "float", "PointLightRadius", "Animates the radius of a PointLight." ),
-		new( "LightRadius", "SpotLight", "float", "SpotLightRadius", "Animates the radius of a SpotLight." ),
-		new( "SpotLightConeOuter", "SpotLight", "float", "SpotLightConeOuter", "Animates the outer cone angle of a SpotLight." ),
-		new( "SpotLightConeInner", "SpotLight", "float", "SpotLightConeInner", "Animates the inner cone angle of a SpotLight." ),
-		new( "CameraFieldOfView", "CameraComponent", "float", "CameraFieldOfView", "Animates the field of view of a camera." ),
-		new( "CameraOrthographicHeight", "CameraComponent", "float", "CameraOrthographicHeight", "Animates the orthographic height of a camera." ),
-		new( "SoundVolume", "BaseSoundComponent", "float", "SoundVolume", "Animates the volume of a sound component." ),
-		new( "SoundPitch", "BaseSoundComponent", "float", "SoundPitch", "Animates the pitch of a sound component." ),
-		new( "SoundVolume", "SoundHandle", "float", "SoundHandleVolume", "Animates the volume of a playing sound." ),
-		new( "SoundPitch", "SoundHandle", "float", "SoundHandlePitch", "Animates the pitch of a playing sound." ),
+		new( "Color", "Component.ITintable", "Color", "TintableColor", "Animates the tint color of a component (ModelRenderer, Light, MeshComponent, ParticleEffect, etc.).", Extension: true, ExtensionName: "TweenColor" ),
+		new( "Alpha", "Component.ITintable", "float", "TintableAlpha", "Animates the alpha of the tint color of a component (ModelRenderer, Light, MeshComponent, ParticleEffect, etc.).", Extension: true, ExtensionName: "TweenAlpha" ),
+		new( "Color", "SpriteRenderer", "Color", "SpriteColor", "Animates the color of a SpriteRenderer.", Extension: true, ExtensionName: "TweenColor" ),
+		new( "Alpha", "SpriteRenderer", "float", "SpriteAlpha", "Animates the alpha of a SpriteRenderer.", Extension: true, ExtensionName: "TweenAlpha" ),
+		new( "Color", "TextRenderer", "Color", "TextColor", "Animates the color of a TextRenderer.", Extension: true, ExtensionName: "TweenColor" ),
+		new( "Alpha", "TextRenderer", "float", "TextAlpha", "Animates the alpha of a TextRenderer.", Extension: true, ExtensionName: "TweenAlpha" ),
+		new( "TextFontSize", "TextRenderer", "float", "TextFontSize", "Animates the font size of a TextRenderer.", Extension: true, ExtensionName: "TweenFontSize", Member: "FontSize" ),
+		new( "TextScale", "TextRenderer", "float", "TextScale", "Animates the scale of a TextRenderer.", Extension: true, ExtensionName: "TweenScale", Member: "Scale" ),
+		new( "LightRadius", "PointLight", "float", "PointLightRadius", "Animates the radius of a PointLight.", Extension: true, ExtensionName: "TweenRadius" ),
+		new( "LightRadius", "SpotLight", "float", "SpotLightRadius", "Animates the radius of a SpotLight.", Extension: true, ExtensionName: "TweenRadius" ),
+		new( "SpotLightConeOuter", "SpotLight", "float", "SpotLightConeOuter", "Animates the outer cone angle of a SpotLight.", Extension: true, ExtensionName: "TweenConeOuter" ),
+		new( "SpotLightConeInner", "SpotLight", "float", "SpotLightConeInner", "Animates the inner cone angle of a SpotLight.", Extension: true, ExtensionName: "TweenConeInner" ),
+		new( "LightIntensity", "Light", "float", "LightIntensity", "Animates the brightness multiplier of a light.", Extension: true, ExtensionName: "TweenIntensity", Member: "Intensity" ),
+		new( "LightTemperature", "Light", "float", "LightTemperature", "Animates the color temperature of a light, in Kelvin (1000 is warm red, 6500 is neutral, 12000 is cold blue).", Extension: true, ExtensionName: "TweenTemperature", Member: "Temperature" ),
+		new( "Color", "AmbientLight", "Color", "AmbientLightColor", "Animates the color of an AmbientLight.", Extension: true, ExtensionName: "TweenColor", Member: "Color" ),
+		new( "DirectionalLightSkyColor", "DirectionalLight", "Color", "DirectionalLightSkyColor", "Animates the sky (ambient) color of a DirectionalLight.", Extension: true, ExtensionName: "TweenSkyColor", Member: "SkyColor" ),
+		new( "CameraFieldOfView", "CameraComponent", "float", "CameraFieldOfView", "Animates the field of view of a camera.", Extension: true, ExtensionName: "TweenFieldOfView" ),
+		new( "CameraOrthographicHeight", "CameraComponent", "float", "CameraOrthographicHeight", "Animates the orthographic height of a camera.", Extension: true, ExtensionName: "TweenOrthographicHeight" ),
+		new( "CameraZNear", "CameraComponent", "float", "CameraZNear", "Animates the near clipping plane of a camera.", Extension: true, ExtensionName: "TweenZNear", Member: "ZNear" ),
+		new( "CameraZFar", "CameraComponent", "float", "CameraZFar", "Animates the far clipping plane of a camera.", Extension: true, ExtensionName: "TweenZFar", Member: "ZFar" ),
+		new( "CameraBackgroundColor", "CameraComponent", "Color", "CameraBackgroundColor", "Animates the background color of a camera.", Extension: true, ExtensionName: "TweenBackgroundColor", Member: "BackgroundColor" ),
+		new( "SoundVolume", "BaseSoundComponent", "float", "SoundVolume", "Animates the volume of a sound component.", Extension: true, ExtensionName: "TweenVolume" ),
+		new( "SoundPitch", "BaseSoundComponent", "float", "SoundPitch", "Animates the pitch of a sound component.", Extension: true, ExtensionName: "TweenPitch" ),
+		new( "SoundVolume", "SoundHandle", "float", "SoundHandleVolume", "Animates the volume of a playing sound.", Extension: true, ExtensionName: "TweenVolume" ),
+		new( "SoundPitch", "SoundHandle", "float", "SoundHandlePitch", "Animates the pitch of a playing sound.", Extension: true, ExtensionName: "TweenPitch" ),
+
+		new( "BloomStrength", "Bloom", "float", "BloomStrength", "Animates the strength of the Bloom post-process effect.", Extension: true, ExtensionName: "TweenStrength", Member: "Strength" ),
+		new( "BloomThreshold", "Bloom", "float", "BloomThreshold", "Animates the brightness threshold of the Bloom post-process effect.", Extension: true, ExtensionName: "TweenThreshold", Member: "Threshold" ),
+		new( "BloomTint", "Bloom", "Color", "BloomTint", "Animates the tint of the Bloom post-process effect.", Extension: true, ExtensionName: "TweenTint", Member: "Tint" ),
+		new( "VignetteIntensity", "Vignette", "float", "VignetteIntensity", "Animates the intensity of the Vignette post-process effect, from 0 to 1.", Extension: true, ExtensionName: "TweenIntensity", Member: "Intensity" ),
+		new( "VignetteSmoothness", "Vignette", "float", "VignetteSmoothness", "Animates the smoothness of the Vignette post-process effect, from 0 to 1.", Extension: true, ExtensionName: "TweenSmoothness", Member: "Smoothness" ),
+		new( "Color", "Vignette", "Color", "VignetteColor", "Animates the color of the Vignette post-process effect.", Extension: true, ExtensionName: "TweenColor", Member: "Color" ),
+		new( "ColorAdjustmentsBlend", "ColorAdjustments", "float", "ColorAdjustmentsBlend", "Animates how much the ColorAdjustments post-process effect is applied, from 0 to 1.", Extension: true, ExtensionName: "TweenBlend", Member: "Blend" ),
+		new( "ColorAdjustmentsSaturation", "ColorAdjustments", "float", "ColorAdjustmentsSaturation", "Animates the saturation of the ColorAdjustments post-process effect, where 1 is unchanged and 0 is grayscale.", Extension: true, ExtensionName: "TweenSaturation", Member: "Saturation" ),
+		new( "ColorAdjustmentsHueRotate", "ColorAdjustments", "float", "ColorAdjustmentsHueRotate", "Animates the hue rotation of the ColorAdjustments post-process effect, in degrees.", Extension: true, ExtensionName: "TweenHueRotate", Member: "HueRotate" ),
+		new( "ColorAdjustmentsBrightness", "ColorAdjustments", "float", "ColorAdjustmentsBrightness", "Animates the brightness of the ColorAdjustments post-process effect, where 1 is unchanged.", Extension: true, ExtensionName: "TweenBrightness", Member: "Brightness" ),
+		new( "ColorAdjustmentsContrast", "ColorAdjustments", "float", "ColorAdjustmentsContrast", "Animates the contrast of the ColorAdjustments post-process effect, where 1 is unchanged.", Extension: true, ExtensionName: "TweenContrast", Member: "Contrast" ),
+		new( "ChromaticAberrationScale", "ChromaticAberration", "float", "ChromaticAberrationScale", "Animates the strength of the ChromaticAberration post-process effect, from 0 to 1.", Extension: true, ExtensionName: "TweenScale", Member: "Scale" ),
+		new( "BlurSize", "Blur", "float", "BlurSize", "Animates the size of the Blur post-process effect, from 0 to 1.", Extension: true, ExtensionName: "TweenSize", Member: "Size" ),
+		new( "PixelateScale", "Pixelate", "float", "PixelateScale", "Animates the pixel scale of the Pixelate post-process effect.", Extension: true, ExtensionName: "TweenScale", Member: "Scale" ),
+		new( "FilmGrainIntensity", "FilmGrain", "float", "FilmGrainIntensity", "Animates the intensity of the FilmGrain post-process effect.", Extension: true, ExtensionName: "TweenIntensity", Member: "Intensity" ),
+		new( "DepthOfFieldFocalDistance", "DepthOfField", "float", "DepthOfFieldFocalDistance", "Animates the focal distance of the DepthOfField post-process effect.", Extension: true, ExtensionName: "TweenFocalDistance", Member: "FocalDistance" ),
+		new( "DepthOfFieldBlurSize", "DepthOfField", "float", "DepthOfFieldBlurSize", "Animates the blur size of the DepthOfField post-process effect.", Extension: true, ExtensionName: "TweenBlurSize", Member: "BlurSize" ),
+		new( "MotionBlurScale", "MotionBlur", "float", "MotionBlurScale", "Animates the strength of the MotionBlur post-process effect, from 0 to 1.", Extension: true, ExtensionName: "TweenScale", Member: "Scale" ),
+		new( "SharpenScale", "Sharpen", "float", "SharpenScale", "Animates the strength of the Sharpen post-process effect.", Extension: true, ExtensionName: "TweenScale", Member: "Scale" ),
+		new( "PostProcessVolumeBlendWeight", "PostProcessVolume", "float", "PostProcessVolumeBlendWeight", "Animates how much a PostProcessVolume is applied, from 0 to 1.", Extension: true, ExtensionName: "TweenBlendWeight", Member: "BlendWeight" ),
+		new( "Color", "Fog", "Color", "FogColor", "Animates the color of the Fog post-process effect. Used when its color source is a solid color.", Extension: true, ExtensionName: "TweenColor", Member: "Color" ),
+		new( "FogStartDistance", "Fog", "float", "FogStartDistance", "Animates the distance where the Fog post-process effect starts.", Extension: true, ExtensionName: "TweenStartDistance", Member: "StartDistance" ),
+		new( "FogDistanceRange", "Fog", "Vector2", "FogDistanceRange", "Animates the start and end distance of the Fog post-process effect in linear mode.", Extension: true, ExtensionName: "TweenDistanceRange", Member: "DistanceRange" ),
+		new( "FogAttenuationDistance", "Fog", "float", "FogAttenuationDistance", "Animates the distance where the Fog post-process effect reaches its maximum opacity in exponential mode.", Extension: true, ExtensionName: "TweenAttenuationDistance", Member: "AttenuationDistance" ),
+		new( "FogMaximumOpacity", "Fog", "float", "FogMaximumOpacity", "Animates the maximum opacity of the Fog post-process effect, from 0 to 1.", Extension: true, ExtensionName: "TweenMaximumOpacity", Member: "MaximumOpacity" ),
+		new( "VolumetricFogStrength", "VolumetricFogVolume", "float", "VolumetricFogStrength", "Animates the strength of a VolumetricFogVolume, from 0 to 1.", Extension: true, ExtensionName: "TweenStrength", Member: "Strength" ),
+		new( "Color", "VolumetricFogVolume", "Color", "VolumetricFogColor", "Animates the color of a VolumetricFogVolume.", Extension: true, ExtensionName: "TweenColor", Member: "Color" ),
+
+		new( "RigidbodyPosition", "Rigidbody", "Vector3", "RigidbodyPosition", "Moves a Rigidbody to a world position by setting its velocity every fixed update, so it pushes other bodies instead of passing through them. Always uses UpdateType.FixedUpdate. When the tween completes, the body is placed exactly at the end value and stopped.", Extension: true, ExtensionName: "TweenPosition" ),
+		new( "RigidbodyRotation", "Rigidbody", "Rotation", "RigidbodyRotation", "Rotates a Rigidbody to a world rotation by setting its angular velocity every fixed update. Always uses UpdateType.FixedUpdate. When the tween completes, the body is placed exactly at the end value and stopped.", Extension: true, AcceptsAngles: true, ExtensionName: "TweenRotation" ),
+
+		new( "RendererAttribute", "Renderer", "float", "RendererAttributeFloat", "Animates a shader attribute of a renderer by name (Renderer.Attributes). Attributes that weren't set read as zero, so pass the start value if the shader's default isn't zero.", Extension: true, ExtensionName: "TweenAttribute", NameParameter: "attribute" ),
+		new( "RendererAttribute", "Renderer", "Vector3", "RendererAttributeVector3", "Animates a shader attribute of a renderer by name (Renderer.Attributes). Attributes that weren't set read as zero, so pass the start value if the shader's default isn't zero.", Extension: true, ExtensionName: "TweenAttribute", NameParameter: "attribute" ),
+		new( "RendererAttribute", "Renderer", "Vector4", "RendererAttributeVector4", "Animates a shader attribute of a renderer by name (Renderer.Attributes). Attributes that weren't set read as zero, so pass the start value if the shader's default isn't zero.", Extension: true, ExtensionName: "TweenAttribute", NameParameter: "attribute" ),
+		new( "RendererAttribute", "Renderer", "Color", "RendererAttributeColor", "Animates a shader attribute of a renderer by name (Renderer.Attributes), stored as a float4. Attributes that weren't set read as zero, so pass the start value if the shader's default isn't zero.", Extension: true, ExtensionName: "TweenAttribute", NameParameter: "attribute" ),
+		new( "AnimParameter", "SkinnedModelRenderer", "float", "AnimParameterFloat", "Animates a float parameter of the renderer's animation graph.", Extension: true, ExtensionName: "TweenParameter", NameParameter: "parameter" ),
+		new( "AnimParameter", "SkinnedModelRenderer", "Vector3", "AnimParameterVector3", "Animates a vector parameter of the renderer's animation graph.", Extension: true, ExtensionName: "TweenParameter", NameParameter: "parameter" ),
+		new( "AnimParameter", "SkinnedModelRenderer", "Rotation", "AnimParameterRotation", "Animates a rotation parameter of the renderer's animation graph using spherical interpolation.", Extension: true, ExtensionName: "TweenParameter", NameParameter: "parameter" ),
+		new( "Morph", "SkinnedModelRenderer", "float", "Morph", "Animates the weight of a morph (blend shape), usually from 0 to 1. The morph stays overridden after the tween ends; call Morphs.Clear() to give it back to the animation.", Extension: true, ExtensionName: "TweenMorph", NameParameter: "morph" ),
+		new( "Property", "object", "float", "PropertyFloat", "Animates any property by name through the TypeLibrary, e.g. a [Property] of a component. Boxes the value on every update, so it allocates; prefer a typed method or Tween.Custom in hot paths.", Extension: true, ExtensionName: "TweenProperty", NameParameter: "property", ExtensionTarget: "Component" ),
+		new( "Property", "object", "Vector2", "PropertyVector2", "Animates any property by name through the TypeLibrary, e.g. a [Property] of a component. Boxes the value on every update, so it allocates; prefer a typed method or Tween.Custom in hot paths.", Extension: true, ExtensionName: "TweenProperty", NameParameter: "property", ExtensionTarget: "Component" ),
+		new( "Property", "object", "Vector3", "PropertyVector3", "Animates any property by name through the TypeLibrary, e.g. a [Property] of a component. Boxes the value on every update, so it allocates; prefer a typed method or Tween.Custom in hot paths.", Extension: true, ExtensionName: "TweenProperty", NameParameter: "property", ExtensionTarget: "Component" ),
+		new( "Property", "object", "Vector4", "PropertyVector4", "Animates any property by name through the TypeLibrary, e.g. a [Property] of a component. Boxes the value on every update, so it allocates; prefer a typed method or Tween.Custom in hot paths.", Extension: true, ExtensionName: "TweenProperty", NameParameter: "property", ExtensionTarget: "Component" ),
+		new( "Property", "object", "Color", "PropertyColor", "Animates any property by name through the TypeLibrary, e.g. a [Property] of a component. Boxes the value on every update, so it allocates; prefer a typed method or Tween.Custom in hot paths.", Extension: true, ExtensionName: "TweenProperty", NameParameter: "property", ExtensionTarget: "Component" ),
+		new( "Property", "object", "Rotation", "PropertyRotation", "Animates any property by name through the TypeLibrary, e.g. a [Property] of a component, using spherical interpolation. Boxes the value on every update, so it allocates; prefer a typed method or Tween.Custom in hot paths.", Extension: true, ExtensionName: "TweenProperty", NameParameter: "property", ExtensionTarget: "Component" ),
+		new( "Property", "object", "Angles", "PropertyAngles", "Animates any property by name through the TypeLibrary, e.g. a [Property] of a component. Boxes the value on every update, so it allocates; prefer a typed method or Tween.Custom in hot paths.", Extension: true, ExtensionName: "TweenProperty", NameParameter: "property", ExtensionTarget: "Component" ),
 		new( "PanelOpacity", "Panel", "float", "PanelOpacity", "Animates the opacity of a UI panel. Doesn't recalculate the layout.", Extension: true, ExtensionName: "TweenOpacity" ),
 		new( "PanelTranslate", "Panel", "Vector2", "PanelTranslate", "Moves a UI panel with 'transform: translate()', in pixels. Doesn't recalculate the layout.", Extension: true, ExtensionName: "TweenTranslate" ),
 		new( "PanelRotate", "Panel", "float", "PanelRotate", "Rotates a UI panel with 'transform: rotate()', in degrees. Doesn't recalculate the layout.", Extension: true, ExtensionName: "TweenRotate" ),
@@ -163,12 +229,71 @@ public static class TweenCodeGenerator
 	/// </summary>
 	public static string GeneratePanelExtensions() => GenerateExtensions( "Panel", "PanelTweenExtensions", "panel.TweenTranslate( new Vector2( 0, -40 ), 0.3f, Ease.OutBack );" );
 
+	/// <summary>
+	/// Generates the source of ComponentTweenExtensions.Generated.cs.
+	/// </summary>
+	public static string GenerateComponentExtensions() => GenerateExtensions( null, "ComponentTweenExtensions", "light.TweenIntensity( 4, 0.5f );" );
+
+	/// <summary>
+	/// Generates the source of TweenData.Generated.cs: getters and setters of the rows with a <see cref="PropertyInfo.Member"/>.
+	/// </summary>
+	public static string GenerateAccessors()
+	{
+		var rows = Properties.Where( x => x.Member is not null ).ToArray();
+		var lines = new List<string>( Header ) { "internal sealed partial class TweenData", "{" };
+
+		lines.Add( "\tstatic PropType GetGeneratedPropType( TweenType tweenType ) => tweenType switch" );
+		lines.Add( "\t{" );
+		foreach ( var group in rows.GroupBy( x => x.Type ) )
+		{
+			var types = group.Select( x => $"TweenType.{x.TweenType}" ).ToArray();
+			lines.Add( $"\t\t{types[0]}" );
+			lines.AddRange( types.Skip( 1 ).Select( x => $"\t\t\tor {x}" ) );
+			lines.Add( $"\t\t\t=> PropType.{PropTypeOf( group.Key )}," );
+		}
+		lines.Add( "\t\t_ => PropType.None" );
+		lines.Add( "\t};" );
+		lines.Add( "" );
+
+		lines.Add( "\tbool TryGetGeneratedValue( out ValueContainer value )" );
+		lines.Add( "\t{" );
+		lines.Add( "\t\tvar target = Target;" );
+		lines.Add( "\t\tswitch ( TweenType )" );
+		lines.Add( "\t\t{" );
+		foreach ( var p in rows )
+			lines.Add( $"\t\t\tcase TweenType.{p.TweenType}: value = ValueContainer.From( (target as {p.Target}).{p.Member} ); return true;" );
+		lines.Add( "\t\t}" );
+		lines.Add( "" );
+		lines.Add( "\t\tvalue = default;" );
+		lines.Add( "\t\treturn false;" );
+		lines.Add( "\t}" );
+		lines.Add( "" );
+
+		lines.Add( "\tbool TrySetGeneratedValue()" );
+		lines.Add( "\t{" );
+		lines.Add( "\t\tvar target = Target;" );
+		lines.Add( "\t\tswitch ( TweenType )" );
+		lines.Add( "\t\t{" );
+		foreach ( var p in rows )
+			lines.Add( $"\t\t\tcase TweenType.{p.TweenType}: (target as {p.Target}).{p.Member} = Current{SuffixOf( p.Type )}; return true;" );
+		lines.Add( "\t\t}" );
+		lines.Add( "" );
+		lines.Add( "\t\treturn false;" );
+		lines.Add( "\t}" );
+		lines.AddRange( ["}", ""] );
+		return string.Join( NewLine, lines );
+	}
+
+	static string SuffixOf( string type ) => ValueTypes.First( x => x.Type == type ).Suffix;
+
+	static string PropTypeOf( string type ) => type == "Angles" ? "Vector3" : SuffixOf( type );
+
 	static string GenerateExtensions( string target, string className, string example )
 	{
 		var lines = new List<string>( Header )
 		{
 			"/// <summary>",
-			$"/// Shortcuts for <see cref=\"Tween\"/> methods that animate a {target}.",
+			$"/// Shortcuts for <see cref=\"Tween\"/> methods that animate {(target is null ? "components" : $"a {target}")}.",
 			"/// <code>",
 			$"/// {example}",
 			"/// </code>",
@@ -177,7 +302,7 @@ public static class TweenCodeGenerator
 			"{"
 		};
 
-		foreach ( var property in Properties.Where( x => x.Extension && x.Target == target ) )
+		foreach ( var property in Properties.Where( x => x.Extension && (target is null ? x.IsComponent : x.ExtendedType == target) ) )
 			lines.AddRange( PropertyOverloads( property, true ) );
 
 		TrimLastEmpty( lines );
@@ -194,6 +319,8 @@ public static class TweenCodeGenerator
 		WriteIfChanged( Path.Combine( apiDirectory, TweenFileName ), GenerateTween(), changed );
 		WriteIfChanged( Path.Combine( apiDirectory, ExtensionsFileName ), GenerateExtensions(), changed );
 		WriteIfChanged( Path.Combine( apiDirectory, PanelExtensionsFileName ), GeneratePanelExtensions(), changed );
+		WriteIfChanged( Path.Combine( apiDirectory, ComponentExtensionsFileName ), GenerateComponentExtensions(), changed );
+		WriteIfChanged( Path.GetFullPath( Path.Combine( apiDirectory, "..", "Internal", AccessorsFileName ) ), GenerateAccessors(), changed );
 		return changed;
 	}
 
@@ -208,41 +335,45 @@ public static class TweenCodeGenerator
 
 	static IEnumerable<string> PropertyOverloads( PropertyInfo p, bool extension )
 	{
-		var self = extension ? $"this {p.Target} target" : $"{p.Target} target";
+		// Named values (shader attributes, animgraph parameters, ...) take the name right after the target
+		var name = p.NameParameter is null ? "" : $", string {p.NameParameter}";
+		var arg = p.NameParameter is null ? "target" : $"target, {p.NameParameter}";
+		var self = (extension ? $"this {p.ExtendedType} target" : $"{p.Target} target") + name;
 		var method = extension ? p.ExtensionMethod : p.Name;
 		var call = extension ? $"Tween.{p.Name}" : p.Name;
-		var inherit = $"\t/// <inheritdoc cref=\"Tween.{p.Name}({p.Target}, TweenSettings{{{p.Type}}})\"/>";
+		var nameCref = p.NameParameter is null ? "" : ", string";
+		var inherit = $"\t/// <inheritdoc cref=\"Tween.{p.Name}({p.Target}{nameCref}, TweenSettings{{{p.Type}}})\"/>";
 		var type = p.ParameterType;
 
 		if ( !p.StartRequired )
 		{
 			yield return inherit;
 			yield return $"\tpublic static Tween {method}( {self}, {type} endValue, float duration, {Common} )";
-			yield return $"\t\t=> {call}( target, new TweenSettings<{p.Type}>( {p.Value( "endValue" )}, new TweenSettings( {CommonArgs} ) ) );";
+			yield return $"\t\t=> {call}( {arg}, new TweenSettings<{p.Type}>( {p.Value( "endValue" )}, new TweenSettings( {CommonArgs} ) ) );";
 			yield return "";
 		}
 
 		yield return inherit;
 		yield return $"\tpublic static Tween {method}( {self}, {type} startValue, {type} endValue, float duration, {Common} )";
-		yield return $"\t\t=> {call}( target, new TweenSettings<{p.Type}>( {p.Value( "startValue" )}, {p.Value( "endValue" )}, new TweenSettings( {CommonArgs} ) ) );";
+		yield return $"\t\t=> {call}( {arg}, new TweenSettings<{p.Type}>( {p.Value( "startValue" )}, {p.Value( "endValue" )}, new TweenSettings( {CommonArgs} ) ) );";
 		yield return "";
 
 		if ( !p.StartRequired )
 		{
 			yield return inherit;
-			yield return $"\tpublic static Tween {method}( {self}, {type} endValue, TweenSettings settings ) => {call}( target, new TweenSettings<{p.Type}>( {p.Value( "endValue" )}, settings ) );";
+			yield return $"\tpublic static Tween {method}( {self}, {type} endValue, TweenSettings settings ) => {call}( {arg}, new TweenSettings<{p.Type}>( {p.Value( "endValue" )}, settings ) );";
 			yield return "";
 		}
 
 		if ( extension )
 		{
 			yield return inherit;
-			yield return $"\tpublic static Tween {method}( {self}, TweenSettings<{p.Type}> settings ) => {call}( target, settings );";
+			yield return $"\tpublic static Tween {method}( {self}, TweenSettings<{p.Type}> settings ) => {call}( {arg}, settings );";
 			yield return "";
 			if ( p.AcceptsAngles )
 			{
 				yield return inherit;
-				yield return $"\tpublic static Tween {method}( {self}, TweenSettings<Angles> settings ) => {call}( target, settings );";
+				yield return $"\tpublic static Tween {method}( {self}, TweenSettings<Angles> settings ) => {call}( {arg}, settings );";
 				yield return "";
 			}
 
@@ -251,13 +382,14 @@ public static class TweenCodeGenerator
 
 		yield return $"\t/// <summary>{p.Summary}</summary>";
 		var settings = p.StartRequired ? "ValidateAnglesData( settings )" : "settings";
-		yield return $"\tpublic static Tween {p.Name}( {p.Target} target, TweenSettings<{p.Type}> settings ) => Animate( target, TweenType.{p.TweenType}, {settings} );";
+		var nameArg = p.NameParameter is null ? "" : $", {p.NameParameter}";
+		yield return $"\tpublic static Tween {p.Name}( {self}, TweenSettings<{p.Type}> settings ) => Animate( target, TweenType.{p.TweenType}, {settings}{nameArg} );";
 		yield return "";
 
 		if ( p.AcceptsAngles )
 		{
 			yield return inherit;
-			yield return $"\tpublic static Tween {p.Name}( {p.Target} target, TweenSettings<Angles> settings ) => {p.Name}( target, ToRotation( settings ) );";
+			yield return $"\tpublic static Tween {p.Name}( {self}, TweenSettings<Angles> settings ) => {p.Name}( {arg}, ToRotation( settings ) );";
 			yield return "";
 		}
 	}
