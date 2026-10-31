@@ -1,0 +1,71 @@
+@using Sandbox;
+@using Sandbox.UI;
+@using SboxTween;
+@inherits PanelComponent
+@namespace SboxTweenExample
+
+<root>
+	<div class="panel">
+		<div class="title">SboxTween</div>
+		<div class="subtitle">PrimeTween for s&box</div>
+
+		<div class="section">Sequence</div>
+		<div class="row">
+			<div class="button" onclick=@( () => Demo?.PlaySequence() )>Play Sequence</div>
+		</div>
+		<div class="progress">
+			<div class="progress-fill" style="width: @( (Demo?.SequenceProgress ?? 0) * 100 )%"></div>
+		</div>
+
+		<div class="section">Shake & Punch</div>
+		<div class="row">
+			<div class="button" onclick=@( () => Demo?.Punch() )>Punch</div>
+			<div class="button" onclick=@( () => Demo?.ShakeObject() )>Shake</div>
+			<div class="button" onclick=@( () => Demo?.ShakeCamera() )>Camera</div>
+		</div>
+
+		<div class="section">Control</div>
+		<div class="row">
+			<div class="button @( Demo?.IsSlowMotion == true ? "active" : "" )" onclick=@( () => Demo?.ToggleSlowMotion() )>Slow-mo</div>
+			<div class="button @( Demo?.IsPaused == true ? "active" : "" )" onclick=@( () => Demo?.TogglePause() )>Pause All</div>
+		</div>
+		<div class="row">
+			<div class="button" onclick=@( () => Demo?.CompleteAll() )>Complete All</div>
+			<div class="button" onclick=@( () => Demo?.StopAll() )>Stop All</div>
+			<div class="button" onclick=@( () => Demo?.Rebuild() )>Rebuild</div>
+		</div>
+
+		<div class="stats">
+			<div class="stat"><span class="label">Alive tweens</span><span class="value">@( Demo?.Manager?.TweensCount ?? 0 )</span></div>
+			<div class="stat"><span class="label">Max alive</span><span class="value">@( Demo?.Manager?.MaxAliveTweens ?? 0 )</span></div>
+			<div class="stat"><span class="label">Async loops</span><span class="value">@( Demo?.AsyncLoops ?? 0 )</span></div>
+			<div class="stat"><span class="label">Callbacks</span><span class="value">@( Demo?.Callbacks ?? 0 )</span></div>
+			<div class="stat"><span class="label">Time scale</span><span class="value">@Scene.TimeScale.ToString( "0.00" )</span></div>
+		</div>
+
+		<div class="event">@( Demo?.LastEvent )</div>
+	</div>
+</root>
+
+@code
+{
+	[Property] public TweenDemo Demo { get; set; }
+
+	protected override void OnStart()
+	{
+		Demo ??= Scene.Get<TweenDemo>();
+
+		// The panel animates itself with SboxTween too
+		Tween.PanelOpacity( Panel, 0, 1, 0.8f, Ease.OutQuad );
+	}
+
+	protected override int BuildHash() => HashCode.Combine(
+		Demo?.Manager?.TweensCount,
+		Demo?.SequenceProgress,
+		Demo?.LastEvent,
+		Demo?.AsyncLoops,
+		Demo?.Callbacks,
+		Demo?.IsSlowMotion,
+		Demo?.IsPaused,
+		Scene.TimeScale );
+}
