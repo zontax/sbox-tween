@@ -83,18 +83,25 @@ TweenDemoPanel
 	}
 }
 
-.progress
+// The button itself fills up while the sequence plays
+.progress-button
 {
-	height: 6px;
-	background-color: #2a3140;
-	border-radius: 3px;
+	position: relative;
 	overflow: hidden;
-}
 
-.progress-fill
-{
-	height: 100%;
-	background-color: #35a7ff;
+	.progress-fill
+	{
+		position: absolute;
+		left: 0;
+		top: 0;
+		bottom: 0;
+		background-color: #35a7ff66;
+	}
+
+	.button-text
+	{
+		position: relative;
+	}
 }
 
 .stats

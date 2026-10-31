@@ -118,6 +118,24 @@ internal sealed partial class TweenData
 	internal Angles CurrentAngles => (StartValue + EndValueOrDiff * EasedInterpolationFactor).Angles;
 
 	/// <summary>
+	/// Progress of the current cycle without validation, for the debugger. Works for nested animations too.
+	/// </summary>
+	internal float DebugProgress
+	{
+		get
+		{
+			if ( ElapsedTimeTotal == float.MaxValue || (CyclesTotal != -1 && GetCyclesDone() >= CyclesTotal) )
+				return 1;
+
+			if ( CycleDuration <= 0 )
+				return State == State.After ? 1 : 0;
+
+			float elapsed = ElapsedTimeTotal - WaitDelay - CycleDuration * GetCyclesDone();
+			return Math.Clamp( elapsed / CycleDuration, 0, 1 );
+		}
+	}
+
+	/// <summary>
 	/// Guards user callbacks of custom tweens from recursive calls.
 	/// </summary>
 	internal bool BeginCustomCallback()

@@ -465,6 +465,42 @@ public sealed class TweenManager : IDisposable
 		return ProcessAll( onTarget, static _ => true, true );
 	}
 
+	/// <summary>
+	/// Fills <paramref name="entries"/> with snapshots of all alive animations, in the order of creation.
+	/// Children of sequences follow their parent. Used by the editor Tween Debugger.
+	/// </summary>
+	public void CollectDebugEntries( List<TweenDebugEntry> entries )
+	{
+		entries.Clear();
+		for ( int i = 0; i < _running.Length; i++ )
+		{
+			CollectDebugEntries( _running[i], entries );
+			CollectDebugEntries( _pending[i], entries );
+		}
+	}
+
+	static void CollectDebugEntries( List<TweenData> list, List<TweenDebugEntry> entries )
+	{
+		foreach ( var tween in list )
+		{
+			// Nested animations are added after their main sequence
+			if ( tween is null || !tween.IsAlive || (tween.IsInSequence && !tween.IsMainSequenceRoot()) )
+				continue;
+
+			AddDebugEntry( tween, 0, entries );
+		}
+	}
+
+	static void AddDebugEntry( TweenData tween, int depth, List<TweenDebugEntry> entries )
+	{
+		entries.Add( new TweenDebugEntry( tween, depth ) );
+		if ( !tween.IsSequenceRoot() )
+			return;
+
+		foreach ( var child in new TweenData.SelfChildrenEnumerator( tween, true ) )
+			AddDebugEntry( child, depth + 1, entries );
+	}
+
 	/// <inheritdoc cref="Tween.StopAll"/>
 	public int StopAll( object onTarget = null )
 	{

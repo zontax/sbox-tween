@@ -11,10 +11,10 @@
 
 		<div class="section">Sequence</div>
 		<div class="row">
-			<div class="button" onclick=@( () => Demo?.PlaySequence() )>Play Sequence</div>
-		</div>
-		<div class="progress">
-			<div class="progress-fill" style="width: @( (Demo?.SequenceProgress ?? 0) * 100 )%"></div>
+			<div class="button progress-button" onclick=@( () => Demo?.PlaySequence() )>
+				<div class="progress-fill" style="width: @( (Demo?.SequenceProgress ?? 0) * 100 )%"></div>
+				<div class="button-text">Play Sequence</div>
+			</div>
 		</div>
 
 		<div class="section">Shake & Punch</div>

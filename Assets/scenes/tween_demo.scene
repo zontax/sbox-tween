@@ -120,7 +120,7 @@
             "Id": "2189c17d-12ec-4f30-abd2-a3284d60d2ce",
             "Path": "materials/skybox/skybox_day_01.vmat"
           },
-          "Tint": "1,1,1,1"
+          "Tint": "0.52558,0,0,1"
         }
       ],
       "Children": []
