@@ -1,0 +1,35 @@
+{
+  "Title": "Sbox Tween",
+  "Type": "library",
+  "Org": "zontax",
+  "Ident": "sbox_tween",
+  "Schema": 1,
+  "IncludeSourceFiles": false,
+  "Resources": null,
+  "PublishUsedAssetsOnly": false,
+  "PackageReferences": [],
+  "EditorReferences": null,
+  "Mounts": null,
+  "IsStandaloneOnly": false,
+  "AI": {
+    "EnableMcpCommunication": true
+  },
+  "Metadata": {
+    "CsProjName": "sbox_tween",
+    "Compiler": {
+      "RootNamespace": "SboxTween",
+      "DefineConstants": "SANDBOX",
+      "NoWarn": "1701;1702;1591",
+      "WarningsAsErrors": "",
+      "TreatWarningsAsErrors": false,
+      "Nullables": false,
+      "ReleaseMode": "Release",
+      "AssemblyReferences": [],
+      "ReplacementDirectives": {
+        ".Server.cs": "SERVER"
+      },
+      "IgnoreFolders": [],
+      "DistinctAssemblyReferences": []
+    }
+  }
+}

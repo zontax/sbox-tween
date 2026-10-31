@@ -1,0 +1,30 @@
+[
+  {
+    "Key": "Assets\\prefabs",
+    "Value": {
+      "Color": "0.29705,0.72655,0.92558,1",
+      "Icon": ""
+    }
+  },
+  {
+    "Key": "Assets\\resources",
+    "Value": {
+      "Color": "1,0,0,1",
+      "Icon": "1k_plus"
+    }
+  },
+  {
+    "Key": "Assets\\sounds",
+    "Value": {
+      "Color": "0.1966,0.59535,0.24977,1",
+      "Icon": ""
+    }
+  },
+  {
+    "Key": "Assets\\images",
+    "Value": {
+      "Color": "0.90196,0.85882,0.4549,1",
+      "Icon": "image"
+    }
+  }
+]
