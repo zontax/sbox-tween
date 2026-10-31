@@ -1075,18 +1075,21 @@ internal sealed partial class TweenData
 
 		WarnIgnoredOnCompleteIfTargetDestroyed = warnIfTargetDestroyed ?? TweenConfig.WarnIfTargetDestroyed;
 		OnCompleteCallback = onComplete;
-		OnCompleteInvoker = static tween =>
+		OnCompleteInvoker = InvokeOnComplete;
+	}
+
+	// Invokers are named methods, not lambdas: hotload matches methods by name, while lambdas of running tweens can fail to upgrade
+	static void InvokeOnComplete( TweenData tween )
+	{
+		var callback = tween.OnCompleteCallback as Action;
+		try
 		{
-			var callback = tween.OnCompleteCallback as Action;
-			try
-			{
-				callback();
-			}
-			catch ( Exception e )
-			{
-				tween.HandleOnCompleteException( e );
-			}
-		};
+			callback();
+		}
+		catch ( Exception e )
+		{
+			tween.HandleOnCompleteException( e );
+		}
 	}
 
 	internal void OnComplete<T>( T target, Action<T> onComplete, bool? warnIfTargetDestroyed ) where T : class
@@ -1103,25 +1106,27 @@ internal sealed partial class TweenData
 		WarnIgnoredOnCompleteIfTargetDestroyed = warnIfTargetDestroyed ?? TweenConfig.WarnIfTargetDestroyed;
 		OnCompleteTarget = target;
 		OnCompleteCallback = onComplete;
-		OnCompleteInvoker = static tween =>
-		{
-			var callback = tween.OnCompleteCallback as Action<T>;
-			var callbackTarget = tween.OnCompleteTarget as T;
-			if ( IsDestroyed( callbackTarget ) )
-			{
-				tween.WarnOnCompleteIgnored( true );
-				return;
-			}
+		OnCompleteInvoker = InvokeOnCompleteWithTarget<T>;
+	}
 
-			try
-			{
-				callback( callbackTarget );
-			}
-			catch ( Exception e )
-			{
-				tween.HandleOnCompleteException( e );
-			}
-		};
+	static void InvokeOnCompleteWithTarget<T>( TweenData tween ) where T : class
+	{
+		var callback = tween.OnCompleteCallback as Action<T>;
+		var callbackTarget = tween.OnCompleteTarget as T;
+		if ( IsDestroyed( callbackTarget ) )
+		{
+			tween.WarnOnCompleteIgnored( true );
+			return;
+		}
+
+		try
+		{
+			callback( callbackTarget );
+		}
+		catch ( Exception e )
+		{
+			tween.HandleOnCompleteException( e );
+		}
 	}
 
 	void HandleOnCompleteException( Exception e )
@@ -1170,31 +1175,41 @@ internal sealed partial class TweenData
 
 		OnUpdateTarget = target;
 		OnUpdateCallback = onUpdate;
-		OnUpdateInvoker = static tween => tween.InvokeOnUpdate<T>();
+		OnUpdateInvoker = InvokeOnUpdate<T>;
 	}
 
-	void InvokeOnUpdate<T>() where T : class
+	static void InvokeOnUpdate<T>( TweenData tween ) where T : class
 	{
-		var callback = OnUpdateCallback;
-		var target = OnUpdateTarget as T;
+		var callback = tween.OnUpdateCallback;
+		var target = tween.OnUpdateTarget as T;
 		if ( IsDestroyed( target ) )
 		{
-			LogError( $"OnUpdate() will not be called again because OnUpdate()'s target has been destroyed, tween: {GetDescription()}" );
-			ClearOnUpdate();
+			tween.LogError( $"OnUpdate() will not be called again because OnUpdate()'s target has been destroyed, tween: {tween.GetDescription()}" );
+			tween.ClearOnUpdate();
 			return;
 		}
 
 		try
 		{
-			if ( callback is Action<T, Tween> tweenCallback )
-				tweenCallback( target, new Tween( this ) );
-			else
-				(callback as Action<T, Sequence>)( target, new Sequence( this ) );
+			switch ( callback )
+			{
+				case Action<T, Tween> tweenCallback:
+					tweenCallback( target, new Tween( tween ) );
+					break;
+				case Action<T, Sequence> sequenceCallback:
+					sequenceCallback( target, new Sequence( tween ) );
+					break;
+				default:
+					// Happens when the callback comes from an assembly that wasn't hotloaded together with the library
+					tween.LogError( $"OnUpdate() will not be called again because its delegate type '{callback?.GetType()}' no longer matches, tween: {tween.GetDescription()}" );
+					tween.ClearOnUpdate();
+					break;
+			}
 		}
 		catch ( Exception e )
 		{
-			TweenLog.Exception( e, $"OnUpdate() will not be called again because it threw an exception, tween: {GetDescription()}" );
-			ClearOnUpdate();
+			TweenLog.Exception( e, $"OnUpdate() will not be called again because it threw an exception, tween: {tween.GetDescription()}" );
+			tween.ClearOnUpdate();
 		}
 	}
 
@@ -1227,24 +1242,26 @@ internal sealed partial class TweenData
 
 		OnFinallyTarget = target;
 		OnFinallyCallback = onFinally;
-		OnFinallyInvoker = static tween =>
+		OnFinallyInvoker = InvokeOnFinally<T>;
+	}
+
+	static void InvokeOnFinally<T>( TweenData tween ) where T : class
+	{
+		var callback = tween.OnFinallyCallback as Action<T>;
+		var target = tween.OnFinallyTarget as T;
+		// The callback can trigger the manager update that recycles this animation, so clear the fields before the invocation
+		tween.OnFinallyTarget = null;
+		tween.OnFinallyCallback = null;
+		long id = tween.Id;
+		try
 		{
-			var callback = tween.OnFinallyCallback as Action<T>;
-			var target = tween.OnFinallyTarget as T;
-			// The callback can trigger the manager update that recycles this animation, so clear the fields before the invocation
-			tween.OnFinallyTarget = null;
-			tween.OnFinallyCallback = null;
-			long id = tween.Id;
-			try
-			{
-				callback( target );
-			}
-			catch ( Exception e )
-			{
-				string description = tween.Id == id ? tween.GetDescription() : "<released>";
-				TweenLog.Exception( e, $"Animation's OnFinally() callback raised exception, animation: {description}" );
-			}
-		};
+			callback( target );
+		}
+		catch ( Exception e )
+		{
+			string description = tween.Id == id ? tween.GetDescription() : "<released>";
+			TweenLog.Exception( e, $"Animation's OnFinally() callback raised exception, animation: {description}" );
+		}
 	}
 
 	internal void ReportOnFinally()

@@ -429,6 +429,7 @@ public sealed class TweenManager : IDisposable
 
 		IsDisposed = true;
 		AddAllNewTweens();
+		List<Action> continuations = null;
 		foreach ( var list in _running )
 		{
 			foreach ( var tween in list )
@@ -437,7 +438,12 @@ public sealed class TweenManager : IDisposable
 					continue;
 
 				if ( tween.TweenType == TweenType.TweenAwaiter && tween.IsAlive )
-					(tween.OnCompleteTarget as AwaiterSource)?.Cancel();
+				{
+					if ( tween.OnCompleteTarget is AwaiterSource source )
+						source.Cancel();
+					else if ( tween.OnCompleteCallback is Action continuation )
+						(continuations ??= []).Add( continuation );
+				}
 
 				tween.Kill();
 			}
@@ -447,6 +453,22 @@ public sealed class TweenManager : IDisposable
 
 		Shakes.Clear();
 		_tweensCount = 0;
+
+		// Continuations of Tween.Awaiter, they throw OperationCanceledException because the manager is disposed
+		if ( continuations is null )
+			return;
+
+		foreach ( var continuation in continuations )
+		{
+			try
+			{
+				continuation();
+			}
+			catch ( Exception e )
+			{
+				TweenLog.Exception( e, "An awaiter continuation raised exception while the TweenManager was disposed." );
+			}
+		}
 	}
 
 	#endregion

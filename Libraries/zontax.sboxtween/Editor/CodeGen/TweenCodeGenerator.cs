@@ -300,24 +300,37 @@ public static class TweenCodeGenerator
 		yield return "";
 	}
 
+	/// <summary>
+	/// Invokers are named methods, not lambdas: hotload matches methods by name, while lambdas held by running tweens can fail to upgrade.
+	/// </summary>
 	static List<string> Invokers( bool generic )
 	{
 		var lines = new List<string>();
 		foreach ( var v in ValueTypes )
 		{
+			lines.Add( $"\tinternal static readonly Action<TweenData> {v.Suffix} = Invoke{v.Suffix};" );
+			lines.Add( $"\tinternal static readonly Action<TweenData> {v.Suffix}Getter = Get{v.Suffix};" );
+		}
+
+		if ( generic )
+			lines.Add( "\tinternal static readonly Action<TweenData> Shake = InvokeShake;" );
+
+		lines.Add( "" );
+		foreach ( var v in ValueTypes )
+		{
 			var action = generic ? $"Action<T, {v.Type}>" : $"Action<{v.Type}>";
 			var func = generic ? $"Func<T, {v.Type}>" : $"Func<{v.Type}>";
 			var args = generic ? $"d.Target as T, d.Current{v.Suffix}" : $"d.Current{v.Suffix}";
-			var getArgs = generic ? "d.Target as T" : "";
-			lines.AddRange( Invoker( v.Suffix, action, args ) );
-			lines.Add( $"\tinternal static readonly Action<TweenData> {v.Suffix}Getter = static d => d.StartValue = ValueContainer.From( (d.CustomGetter as {func})( {getArgs} ) );" );
+			var getArgs = generic ? "( d.Target as T )" : "()";
+			lines.AddRange( Invoker( $"Invoke{v.Suffix}", action, args ) );
+			lines.Add( $"\tstatic void Get{v.Suffix}( TweenData d ) => d.StartValue = ValueContainer.From( (d.CustomGetter as {func}){getArgs} );" );
 			lines.Add( "" );
 		}
 
 		if ( generic )
 		{
 			// Shakes report the start value plus the shake offset
-			lines.AddRange( Invoker( "Shake", "Action<T, Vector3>", "d.Target as T, d.StartValue.Vector3 + d.GetShakeValue()" ) );
+			lines.AddRange( Invoker( "InvokeShake", "Action<T, Vector3>", "d.Target as T, d.StartValue.Vector3 + d.GetShakeValue()" ) );
 		}
 
 		TrimLastEmpty( lines );
@@ -326,7 +339,7 @@ public static class TweenCodeGenerator
 
 	static IEnumerable<string> Invoker( string name, string delegateType, string arguments )
 	{
-		yield return $"\tinternal static readonly Action<TweenData> {name} = static d =>";
+		yield return $"\tstatic void {name}( TweenData d )";
 		yield return "\t{";
 		yield return "\t\tif ( !d.BeginCustomCallback() )";
 		yield return "\t\t\treturn;";
@@ -339,7 +352,7 @@ public static class TweenCodeGenerator
 		yield return "\t\t{";
 		yield return "\t\t\td.IsUpdating = false;";
 		yield return "\t\t}";
-		yield return "\t};";
+		yield return "\t}";
 		yield return "";
 	}
 

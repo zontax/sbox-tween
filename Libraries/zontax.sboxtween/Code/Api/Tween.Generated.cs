@@ -1156,7 +1156,22 @@ public readonly partial struct Tween
 
 internal static class CustomInvokers
 {
-	internal static readonly Action<TweenData> Float = static d =>
+	internal static readonly Action<TweenData> Float = InvokeFloat;
+	internal static readonly Action<TweenData> FloatGetter = GetFloat;
+	internal static readonly Action<TweenData> Vector2 = InvokeVector2;
+	internal static readonly Action<TweenData> Vector2Getter = GetVector2;
+	internal static readonly Action<TweenData> Vector3 = InvokeVector3;
+	internal static readonly Action<TweenData> Vector3Getter = GetVector3;
+	internal static readonly Action<TweenData> Vector4 = InvokeVector4;
+	internal static readonly Action<TweenData> Vector4Getter = GetVector4;
+	internal static readonly Action<TweenData> Color = InvokeColor;
+	internal static readonly Action<TweenData> ColorGetter = GetColor;
+	internal static readonly Action<TweenData> Rotation = InvokeRotation;
+	internal static readonly Action<TweenData> RotationGetter = GetRotation;
+	internal static readonly Action<TweenData> Angles = InvokeAngles;
+	internal static readonly Action<TweenData> AnglesGetter = GetAngles;
+
+	static void InvokeFloat( TweenData d )
 	{
 		if ( !d.BeginCustomCallback() )
 			return;
@@ -1169,11 +1184,11 @@ internal static class CustomInvokers
 		{
 			d.IsUpdating = false;
 		}
-	};
+	}
 
-	internal static readonly Action<TweenData> FloatGetter = static d => d.StartValue = ValueContainer.From( (d.CustomGetter as Func<float>)(  ) );
+	static void GetFloat( TweenData d ) => d.StartValue = ValueContainer.From( (d.CustomGetter as Func<float>)() );
 
-	internal static readonly Action<TweenData> Vector2 = static d =>
+	static void InvokeVector2( TweenData d )
 	{
 		if ( !d.BeginCustomCallback() )
 			return;
@@ -1186,11 +1201,11 @@ internal static class CustomInvokers
 		{
 			d.IsUpdating = false;
 		}
-	};
+	}
 
-	internal static readonly Action<TweenData> Vector2Getter = static d => d.StartValue = ValueContainer.From( (d.CustomGetter as Func<Vector2>)(  ) );
+	static void GetVector2( TweenData d ) => d.StartValue = ValueContainer.From( (d.CustomGetter as Func<Vector2>)() );
 
-	internal static readonly Action<TweenData> Vector3 = static d =>
+	static void InvokeVector3( TweenData d )
 	{
 		if ( !d.BeginCustomCallback() )
 			return;
@@ -1203,11 +1218,11 @@ internal static class CustomInvokers
 		{
 			d.IsUpdating = false;
 		}
-	};
+	}
 
-	internal static readonly Action<TweenData> Vector3Getter = static d => d.StartValue = ValueContainer.From( (d.CustomGetter as Func<Vector3>)(  ) );
+	static void GetVector3( TweenData d ) => d.StartValue = ValueContainer.From( (d.CustomGetter as Func<Vector3>)() );
 
-	internal static readonly Action<TweenData> Vector4 = static d =>
+	static void InvokeVector4( TweenData d )
 	{
 		if ( !d.BeginCustomCallback() )
 			return;
@@ -1220,11 +1235,11 @@ internal static class CustomInvokers
 		{
 			d.IsUpdating = false;
 		}
-	};
+	}
 
-	internal static readonly Action<TweenData> Vector4Getter = static d => d.StartValue = ValueContainer.From( (d.CustomGetter as Func<Vector4>)(  ) );
+	static void GetVector4( TweenData d ) => d.StartValue = ValueContainer.From( (d.CustomGetter as Func<Vector4>)() );
 
-	internal static readonly Action<TweenData> Color = static d =>
+	static void InvokeColor( TweenData d )
 	{
 		if ( !d.BeginCustomCallback() )
 			return;
@@ -1237,11 +1252,11 @@ internal static class CustomInvokers
 		{
 			d.IsUpdating = false;
 		}
-	};
+	}
 
-	internal static readonly Action<TweenData> ColorGetter = static d => d.StartValue = ValueContainer.From( (d.CustomGetter as Func<Color>)(  ) );
+	static void GetColor( TweenData d ) => d.StartValue = ValueContainer.From( (d.CustomGetter as Func<Color>)() );
 
-	internal static readonly Action<TweenData> Rotation = static d =>
+	static void InvokeRotation( TweenData d )
 	{
 		if ( !d.BeginCustomCallback() )
 			return;
@@ -1254,11 +1269,11 @@ internal static class CustomInvokers
 		{
 			d.IsUpdating = false;
 		}
-	};
+	}
 
-	internal static readonly Action<TweenData> RotationGetter = static d => d.StartValue = ValueContainer.From( (d.CustomGetter as Func<Rotation>)(  ) );
+	static void GetRotation( TweenData d ) => d.StartValue = ValueContainer.From( (d.CustomGetter as Func<Rotation>)() );
 
-	internal static readonly Action<TweenData> Angles = static d =>
+	static void InvokeAngles( TweenData d )
 	{
 		if ( !d.BeginCustomCallback() )
 			return;
@@ -1271,14 +1286,30 @@ internal static class CustomInvokers
 		{
 			d.IsUpdating = false;
 		}
-	};
+	}
 
-	internal static readonly Action<TweenData> AnglesGetter = static d => d.StartValue = ValueContainer.From( (d.CustomGetter as Func<Angles>)(  ) );
+	static void GetAngles( TweenData d ) => d.StartValue = ValueContainer.From( (d.CustomGetter as Func<Angles>)() );
 }
 
 internal static class CustomInvokers<T> where T : class
 {
-	internal static readonly Action<TweenData> Float = static d =>
+	internal static readonly Action<TweenData> Float = InvokeFloat;
+	internal static readonly Action<TweenData> FloatGetter = GetFloat;
+	internal static readonly Action<TweenData> Vector2 = InvokeVector2;
+	internal static readonly Action<TweenData> Vector2Getter = GetVector2;
+	internal static readonly Action<TweenData> Vector3 = InvokeVector3;
+	internal static readonly Action<TweenData> Vector3Getter = GetVector3;
+	internal static readonly Action<TweenData> Vector4 = InvokeVector4;
+	internal static readonly Action<TweenData> Vector4Getter = GetVector4;
+	internal static readonly Action<TweenData> Color = InvokeColor;
+	internal static readonly Action<TweenData> ColorGetter = GetColor;
+	internal static readonly Action<TweenData> Rotation = InvokeRotation;
+	internal static readonly Action<TweenData> RotationGetter = GetRotation;
+	internal static readonly Action<TweenData> Angles = InvokeAngles;
+	internal static readonly Action<TweenData> AnglesGetter = GetAngles;
+	internal static readonly Action<TweenData> Shake = InvokeShake;
+
+	static void InvokeFloat( TweenData d )
 	{
 		if ( !d.BeginCustomCallback() )
 			return;
@@ -1291,11 +1322,11 @@ internal static class CustomInvokers<T> where T : class
 		{
 			d.IsUpdating = false;
 		}
-	};
+	}
 
-	internal static readonly Action<TweenData> FloatGetter = static d => d.StartValue = ValueContainer.From( (d.CustomGetter as Func<T, float>)( d.Target as T ) );
+	static void GetFloat( TweenData d ) => d.StartValue = ValueContainer.From( (d.CustomGetter as Func<T, float>)( d.Target as T ) );
 
-	internal static readonly Action<TweenData> Vector2 = static d =>
+	static void InvokeVector2( TweenData d )
 	{
 		if ( !d.BeginCustomCallback() )
 			return;
@@ -1308,11 +1339,11 @@ internal static class CustomInvokers<T> where T : class
 		{
 			d.IsUpdating = false;
 		}
-	};
+	}
 
-	internal static readonly Action<TweenData> Vector2Getter = static d => d.StartValue = ValueContainer.From( (d.CustomGetter as Func<T, Vector2>)( d.Target as T ) );
+	static void GetVector2( TweenData d ) => d.StartValue = ValueContainer.From( (d.CustomGetter as Func<T, Vector2>)( d.Target as T ) );
 
-	internal static readonly Action<TweenData> Vector3 = static d =>
+	static void InvokeVector3( TweenData d )
 	{
 		if ( !d.BeginCustomCallback() )
 			return;
@@ -1325,11 +1356,11 @@ internal static class CustomInvokers<T> where T : class
 		{
 			d.IsUpdating = false;
 		}
-	};
+	}
 
-	internal static readonly Action<TweenData> Vector3Getter = static d => d.StartValue = ValueContainer.From( (d.CustomGetter as Func<T, Vector3>)( d.Target as T ) );
+	static void GetVector3( TweenData d ) => d.StartValue = ValueContainer.From( (d.CustomGetter as Func<T, Vector3>)( d.Target as T ) );
 
-	internal static readonly Action<TweenData> Vector4 = static d =>
+	static void InvokeVector4( TweenData d )
 	{
 		if ( !d.BeginCustomCallback() )
 			return;
@@ -1342,11 +1373,11 @@ internal static class CustomInvokers<T> where T : class
 		{
 			d.IsUpdating = false;
 		}
-	};
+	}
 
-	internal static readonly Action<TweenData> Vector4Getter = static d => d.StartValue = ValueContainer.From( (d.CustomGetter as Func<T, Vector4>)( d.Target as T ) );
+	static void GetVector4( TweenData d ) => d.StartValue = ValueContainer.From( (d.CustomGetter as Func<T, Vector4>)( d.Target as T ) );
 
-	internal static readonly Action<TweenData> Color = static d =>
+	static void InvokeColor( TweenData d )
 	{
 		if ( !d.BeginCustomCallback() )
 			return;
@@ -1359,11 +1390,11 @@ internal static class CustomInvokers<T> where T : class
 		{
 			d.IsUpdating = false;
 		}
-	};
+	}
 
-	internal static readonly Action<TweenData> ColorGetter = static d => d.StartValue = ValueContainer.From( (d.CustomGetter as Func<T, Color>)( d.Target as T ) );
+	static void GetColor( TweenData d ) => d.StartValue = ValueContainer.From( (d.CustomGetter as Func<T, Color>)( d.Target as T ) );
 
-	internal static readonly Action<TweenData> Rotation = static d =>
+	static void InvokeRotation( TweenData d )
 	{
 		if ( !d.BeginCustomCallback() )
 			return;
@@ -1376,11 +1407,11 @@ internal static class CustomInvokers<T> where T : class
 		{
 			d.IsUpdating = false;
 		}
-	};
+	}
 
-	internal static readonly Action<TweenData> RotationGetter = static d => d.StartValue = ValueContainer.From( (d.CustomGetter as Func<T, Rotation>)( d.Target as T ) );
+	static void GetRotation( TweenData d ) => d.StartValue = ValueContainer.From( (d.CustomGetter as Func<T, Rotation>)( d.Target as T ) );
 
-	internal static readonly Action<TweenData> Angles = static d =>
+	static void InvokeAngles( TweenData d )
 	{
 		if ( !d.BeginCustomCallback() )
 			return;
@@ -1393,11 +1424,11 @@ internal static class CustomInvokers<T> where T : class
 		{
 			d.IsUpdating = false;
 		}
-	};
+	}
 
-	internal static readonly Action<TweenData> AnglesGetter = static d => d.StartValue = ValueContainer.From( (d.CustomGetter as Func<T, Angles>)( d.Target as T ) );
+	static void GetAngles( TweenData d ) => d.StartValue = ValueContainer.From( (d.CustomGetter as Func<T, Angles>)( d.Target as T ) );
 
-	internal static readonly Action<TweenData> Shake = static d =>
+	static void InvokeShake( TweenData d )
 	{
 		if ( !d.BeginCustomCallback() )
 			return;
@@ -1410,5 +1441,5 @@ internal static class CustomInvokers<T> where T : class
 		{
 			d.IsUpdating = false;
 		}
-	};
+	}
 }

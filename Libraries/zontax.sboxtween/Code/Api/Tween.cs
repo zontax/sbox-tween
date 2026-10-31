@@ -532,7 +532,11 @@ public readonly partial struct Tween : IEquatable<Tween>
 	/// <summary>
 	/// Allows <c>await tween;</c>. The continuation runs after the tween is no longer alive.
 	/// </summary>
+#if STANDALONE
+	public Awaiter GetAwaiter() => new( this );
+#else
 	public TaskAwaiter GetAwaiter() => ToTask().GetAwaiter();
+#endif
 
 	/// <summary>
 	/// Returns a Task that completes when the tween is no longer alive.

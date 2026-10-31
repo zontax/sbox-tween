@@ -121,7 +121,11 @@ public readonly partial struct Sequence : IEquatable<Sequence>
 	/// <summary>
 	/// Creates a new Sequence in the active scene.
 	/// </summary>
+	/// <param name="cycles">The number of repetitions. -1 repeats the Sequence indefinitely.</param>
+	/// <param name="cycleMode">Controls how the Sequence behaves with multiple cycles.</param>
 	/// <param name="sequenceEase">Easing applied to the whole timeline of the Sequence.</param>
+	/// <param name="useUnscaledTime">Ignore <see cref="Scene.TimeScale"/>.</param>
+	/// <param name="updateType">Which scene stage updates the Sequence.</param>
 	public static Sequence Create( int cycles = 1, SequenceCycleMode cycleMode = SequenceCycleMode.Restart, Ease sequenceEase = Ease.Linear, bool useUnscaledTime = false, UpdateType updateType = UpdateType.Default )
 		=> CreateIn( TweenManager.Resolve( TweenManager.DummyTarget ), cycles, cycleMode, sequenceEase, useUnscaledTime, updateType );
 
@@ -414,10 +418,12 @@ public readonly partial struct Sequence : IEquatable<Sequence>
 	public Sequence InsertWaitUntil<T>( float atTime, T target, Predicate<T> predicate, float? timeout = null ) where T : class => InsertWait( atTime, target, predicate, true, timeout );
 
 	/// <summary>Suspends the Sequence while <paramref name="predicate"/> returns true. A capturing lambda allocates; prefer the overload with a target.</summary>
-	public Sequence ChainWaitWhile( Func<bool> predicate, float? timeout = null ) => InsertWait( Duration, predicate, static p => p(), false, timeout );
+	public Sequence ChainWaitWhile( Func<bool> predicate, float? timeout = null ) => InsertWait( Duration, predicate, InvokeFunc, false, timeout );
 
 	/// <summary>Suspends the Sequence until <paramref name="predicate"/> returns true. A capturing lambda allocates; prefer the overload with a target.</summary>
-	public Sequence ChainWaitUntil( Func<bool> predicate, float? timeout = null ) => InsertWait( Duration, predicate, static p => p(), true, timeout );
+	public Sequence ChainWaitUntil( Func<bool> predicate, float? timeout = null ) => InsertWait( Duration, predicate, InvokeFunc, true, timeout );
+
+	static bool InvokeFunc( Func<bool> predicate ) => predicate();
 
 	Sequence InsertWait<T>( float atTime, T target, Predicate<T> predicate, bool isWaitUntil, float? timeout ) where T : class
 	{
@@ -452,10 +458,14 @@ public readonly partial struct Sequence : IEquatable<Sequence>
 		data.WaitPredicateTarget = target;
 		data.WaitPredicate = predicate;
 		data.WaitTimeout = timeout ?? float.PositiveInfinity;
-		// Two non-capturing lambdas instead of a flag: the invoker is copied to the main sequence when it suspends
-		data.WaitPredicateShouldWait = isWaitUntil ? static d => ShouldWait<T>( d, true ) : static d => ShouldWait<T>( d, false );
+		// Two methods instead of a flag: the invoker is copied to the main sequence when it suspends
+		data.WaitPredicateShouldWait = isWaitUntil ? ShouldWaitUntil<T> : ShouldWaitWhile<T>;
 		return Insert( atTime, wait );
 	}
+
+	static bool ShouldWaitUntil<T>( TweenData data ) where T : class => ShouldWait<T>( data, true );
+
+	static bool ShouldWaitWhile<T>( TweenData data ) where T : class => ShouldWait<T>( data, false );
 
 	static bool ShouldWait<T>( TweenData data, bool isWaitUntil ) where T : class
 	{
@@ -721,7 +731,11 @@ public readonly partial struct Sequence : IEquatable<Sequence>
 	}
 
 	/// <inheritdoc cref="Tween.GetAwaiter"/>
+#if STANDALONE
+	public Tween.Awaiter GetAwaiter() => Root.GetAwaiter();
+#else
 	public TaskAwaiter GetAwaiter() => Root.GetAwaiter();
+#endif
 
 	/// <inheritdoc cref="Tween.ToTask"/>
 	public Task ToTask() => Root.ToTask();

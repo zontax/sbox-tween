@@ -246,6 +246,74 @@ public class AsyncTests : TweenTestBase
 		Manager.Dispose();
 		Assert.IsTrue( task.IsCanceled );
 	}
+
+	[TestMethod]
+	public void AwaitThrowsWhenCanceled()
+	{
+		using var cts = new CancellationTokenSource();
+		bool finished = false;
+		async Task Run()
+		{
+			await Tween.Delay( 1 ).SetCancellationToken( cts.Token );
+			finished = true;
+		}
+
+		var task = Run();
+		Tick( 0.1f );
+		cts.Cancel();
+		TickFor( 0.2f );
+		Assert.IsTrue( task.IsCanceled );
+		Assert.IsFalse( finished );
+	}
+
+	[TestMethod]
+	public void AwaitThrowsWhenManagerIsDisposed()
+	{
+		async Task Run() => await Tween.Delay( 1 );
+
+		var task = Run();
+		Tick( 0.1f );
+		Manager.Dispose();
+		Assert.IsTrue( task.IsCanceled );
+	}
+
+	[TestMethod]
+	public void AwaitOfDeadTweenContinuesSynchronously()
+	{
+		var tween = Tween.Delay( 0.01f );
+		TickFor( 0.1f );
+		bool finished = false;
+		async Task Run()
+		{
+			await tween;
+			finished = true;
+		}
+
+		Assert.IsTrue( Run().IsCompletedSuccessfully );
+		Assert.IsTrue( finished );
+	}
+
+	[TestMethod]
+	public void AwaitSequenceWorks()
+	{
+		int step = 0;
+		async Task Run()
+		{
+			await Sequence.Create().ChainDelay( 0.1f ).ChainDelay( 0.1f );
+			step = 1;
+			await Tween.Delay( 0.1f );
+			step = 2;
+		}
+
+		var task = Run();
+		TickFor( 0.15f );
+		Assert.AreEqual( 0, step );
+		TickFor( 0.1f );
+		Assert.AreEqual( 1, step );
+		TickFor( 0.15f );
+		Assert.AreEqual( 2, step );
+		Assert.IsTrue( task.IsCompletedSuccessfully );
+	}
 }
 
 [TestClass]

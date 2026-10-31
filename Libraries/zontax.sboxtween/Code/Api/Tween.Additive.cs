@@ -14,7 +14,7 @@ public readonly partial struct Tween
 
 	/// <inheritdoc cref="LocalPositionAdditive(GameObject, Vector3, float, TweenEasing, int, CycleMode, float, float, bool)"/>
 	public static Tween LocalPositionAdditive( GameObject target, Vector3 deltaValue, TweenSettings settings )
-		=> CustomAdditive( target, deltaValue, settings, static ( go, delta ) => go.LocalPosition += delta, static go => go.LocalPosition );
+		=> CustomAdditive( target, deltaValue, settings, AddLocalPosition, GetLocalPosition );
 
 	/// <summary>Moves a GameObject by <paramref name="deltaValue"/> in world space, blending with other additive tweens.</summary>
 	public static Tween WorldPositionAdditive( GameObject target, Vector3 deltaValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
@@ -22,7 +22,7 @@ public readonly partial struct Tween
 
 	/// <inheritdoc cref="WorldPositionAdditive(GameObject, Vector3, float, TweenEasing, int, CycleMode, float, float, bool)"/>
 	public static Tween WorldPositionAdditive( GameObject target, Vector3 deltaValue, TweenSettings settings )
-		=> CustomAdditive( target, deltaValue, settings, static ( go, delta ) => go.WorldPosition += delta, static go => go.WorldPosition );
+		=> CustomAdditive( target, deltaValue, settings, AddWorldPosition, GetWorldPosition );
 
 	/// <summary>Changes the local scale of a GameObject by <paramref name="deltaValue"/>, blending with other additive tweens.</summary>
 	public static Tween LocalScaleAdditive( GameObject target, Vector3 deltaValue, float duration, TweenEasing ease = default, int cycles = 1, CycleMode cycleMode = CycleMode.Restart, float startDelay = 0, float endDelay = 0, bool useUnscaledTime = false )
@@ -30,7 +30,7 @@ public readonly partial struct Tween
 
 	/// <inheritdoc cref="LocalScaleAdditive(GameObject, Vector3, float, TweenEasing, int, CycleMode, float, float, bool)"/>
 	public static Tween LocalScaleAdditive( GameObject target, Vector3 deltaValue, TweenSettings settings )
-		=> CustomAdditive( target, deltaValue, settings, static ( go, delta ) => go.LocalScale += delta, static go => go.LocalScale );
+		=> CustomAdditive( target, deltaValue, settings, AddLocalScale, GetLocalScale );
 
 	/// <summary>
 	/// Rotates a GameObject by <paramref name="deltaValue"/> Euler angles relative to its current rotation, blending with other additive tweens.
@@ -68,6 +68,13 @@ public readonly partial struct Tween
 	/// <inheritdoc cref="WorldRotationAdditive(GameObject, Rotation, float, TweenEasing, int, CycleMode, float, float, bool)"/>
 	public static Tween WorldRotationAdditive( GameObject target, Rotation deltaValue, TweenSettings settings )
 		=> CustomAdditive( target, deltaValue, settings, WorldRotate, GetWorldRotation );
+
+	static void AddLocalPosition( GameObject go, Vector3 delta ) => go.LocalPosition += delta;
+	static void AddWorldPosition( GameObject go, Vector3 delta ) => go.WorldPosition += delta;
+	static void AddLocalScale( GameObject go, Vector3 delta ) => go.LocalScale += delta;
+	static Vector3 GetLocalPosition( GameObject go ) => go.LocalPosition;
+	static Vector3 GetWorldPosition( GameObject go ) => go.WorldPosition;
+	static Vector3 GetLocalScale( GameObject go ) => go.LocalScale;
 
 	// The delta is applied from the right, so it rotates around the object's own axes
 	static void LocalRotate( GameObject go, Rotation delta ) => go.LocalRotation *= delta;
@@ -170,13 +177,33 @@ public readonly partial struct Tween
 /// </summary>
 static class AdditiveInvokers<T> where T : class
 {
-	internal static readonly Action<TweenData> FloatDelta = static d => Linear<float>( d, static c => c.X, static v => ValueContainer.From( v ) );
-	internal static readonly Action<TweenData> Vector2Delta = static d => Linear<Vector2>( d, static c => c.Vector2, static v => ValueContainer.From( v ) );
-	internal static readonly Action<TweenData> Vector3Delta = static d => Linear<Vector3>( d, static c => c.Vector3, static v => ValueContainer.From( v ) );
-	internal static readonly Action<TweenData> Vector4Delta = static d => Linear<Vector4>( d, static c => c.Vector4, static v => ValueContainer.From( v ) );
-	internal static readonly Action<TweenData> ColorDelta = static d => Linear<Color>( d, static c => c.Color, static v => ValueContainer.From( v ) );
+	// Named methods instead of lambdas, so hotload can upgrade the invokers of running tweens
+	internal static readonly Action<TweenData> FloatDelta = InvokeFloat;
+	internal static readonly Action<TweenData> Vector2Delta = InvokeVector2;
+	internal static readonly Action<TweenData> Vector3Delta = InvokeVector3;
+	internal static readonly Action<TweenData> Vector4Delta = InvokeVector4;
+	internal static readonly Action<TweenData> ColorDelta = InvokeColor;
+	internal static readonly Action<TweenData> RotationDelta = InvokeRotation;
+	internal static readonly Action<TweenData> EulerRotation = InvokeEulerRotation;
 
-	internal static readonly Action<TweenData> RotationDelta = static d =>
+	static void InvokeFloat( TweenData d ) => Linear( d, ToFloat, FromFloat );
+	static void InvokeVector2( TweenData d ) => Linear( d, ToVector2, FromVector2 );
+	static void InvokeVector3( TweenData d ) => Linear( d, ToVector3, FromVector3 );
+	static void InvokeVector4( TweenData d ) => Linear( d, ToVector4, FromVector4 );
+	static void InvokeColor( TweenData d ) => Linear( d, ToColor, FromColor );
+
+	static float ToFloat( ValueContainer c ) => c.X;
+	static Vector2 ToVector2( ValueContainer c ) => c.Vector2;
+	static Vector3 ToVector3( ValueContainer c ) => c.Vector3;
+	static Vector4 ToVector4( ValueContainer c ) => c.Vector4;
+	static Color ToColor( ValueContainer c ) => c.Color;
+	static ValueContainer FromFloat( float v ) => ValueContainer.From( v );
+	static ValueContainer FromVector2( Vector2 v ) => ValueContainer.From( v );
+	static ValueContainer FromVector3( Vector3 v ) => ValueContainer.From( v );
+	static ValueContainer FromVector4( Vector4 v ) => ValueContainer.From( v );
+	static ValueContainer FromColor( Color v ) => ValueContainer.From( v );
+
+	static void InvokeRotation( TweenData d )
 	{
 		// The rotation since the previous update, plus the rotation the target missed because of rounding
 		var start = d.StartValue.Rotation;
@@ -184,15 +211,15 @@ static class AdditiveInvokers<T> where T : class
 		var previous = Rotation.Slerp( start, end, d.AdditivePrevT, false );
 		var current = Rotation.Slerp( start, end, d.EasedInterpolationFactor, false );
 		ApplyRotation( d, d.AdditiveErr.Rotation * previous.Inverse * current );
-	};
+	}
 
-	internal static readonly Action<TweenData> EulerRotation = static d =>
+	static void InvokeEulerRotation( TweenData d )
 	{
 		// Composing Euler( delta ) of each update is not Euler( sum of deltas ) when more than one axis is animated, so the delta is a rotation
 		var previous = new Angles( (d.StartValue + d.EndValueOrDiff * d.AdditivePrevT).Vector3 ).ToRotation();
 		var current = new Angles( (d.StartValue + d.EndValueOrDiff * d.EasedInterpolationFactor).Vector3 ).ToRotation();
 		ApplyRotation( d, d.AdditiveErr.Rotation * previous.Inverse * current );
-	};
+	}
 
 	static void ApplyRotation( TweenData d, Rotation delta )
 	{

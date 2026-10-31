@@ -89,10 +89,12 @@ public static partial class PanelTweenExtensions
 	/// panel.DeleteAfter( panel.TweenPopOut() );
 	/// </code>
 	/// </summary>
-	public static Tween DeleteAfter( this Panel panel, Tween tween ) => tween.OnComplete( panel, static p => p.Delete(), warnIfTargetDestroyed: false );
+	public static Tween DeleteAfter( this Panel panel, Tween tween ) => tween.OnComplete( panel, DeletePanel, warnIfTargetDestroyed: false );
 
 	/// <inheritdoc cref="DeleteAfter(Panel, Tween)"/>
-	public static Sequence DeleteAfter( this Panel panel, Sequence sequence ) => sequence.OnComplete( panel, static p => p.Delete(), warnIfTargetDestroyed: false );
+	public static Sequence DeleteAfter( this Panel panel, Sequence sequence ) => sequence.OnComplete( panel, DeletePanel, warnIfTargetDestroyed: false );
+
+	static void DeletePanel( Panel panel ) => panel.Delete();
 
 	#endregion
 

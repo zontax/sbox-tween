@@ -68,6 +68,14 @@ public static class TweenEditorMenu
 		EditorUtility.DisplayDialog( "Sbox Tween", message );
 	}
 
+	[Menu( "Editor", "Sbox Tween/Developer/Run Benchmark", "speed" )]
+	public static void RunBenchmark()
+	{
+		var report = TweenBenchmark.Format( TweenBenchmark.Run() );
+		Log.Info( $"[SboxTween] Benchmark\n{report}" );
+		EditorUtility.DisplayDialog( "Sbox Tween Benchmark", report );
+	}
+
 	public static void SetPausedAll( bool isPaused )
 	{
 		int count = FindManager()?.SetPausedAll( isPaused ) ?? 0;

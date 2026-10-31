@@ -270,6 +270,19 @@ public class TweenBasicsTests : TweenTestBase
 	}
 
 	[TestMethod]
+	public void OnUpdateWithMismatchedDelegateIsCleared()
+	{
+		var factors = new List<float>();
+		var tween = Tween.Custom( 0, 1, 1, _ => { } ).OnUpdate( factors, static ( list, t ) => list.Add( t.InterpolationFactor ) );
+		// Simulates a callback from an assembly that wasn't hotloaded together with the library
+		tween.Data.OnUpdateCallback = new Action<List<float>, int>( ( _, _ ) => { } );
+		ExpectError( "no longer matches" );
+		Tick( 0.5f );
+		Tick( 0.5f );
+		Assert.IsFalse( tween.Data.HasOnUpdate );
+	}
+
+	[TestMethod]
 	public void SecondOnCompleteIsRejected()
 	{
 		var tween = Tween.Delay( 1 ).OnComplete( () => { } );
